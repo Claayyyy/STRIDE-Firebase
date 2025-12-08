@@ -1,0 +1,153 @@
+---
+title: "STRIDE Dashboard Report"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+params:
+  data: NA
+  metrics: NA
+  state: NA
+  metric_names: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(htmltools) # Required for structuring the report
+```
+
+### Report Details
+
+**Drill-down Level:** `r params$state$level`
+
+
+```{r generate_plots, results='asis'}
+# --- PART 2: PLOTTING (This runs visibly) ---
+# --- HELPER: UNIVERSAL DATA FINDER ---
+get_metric_data <- function(data, target_metric, metric_list) {
+  clean_str <- function(x) { tolower(gsub("[. ]", "", x)) }
+  target_clean <- clean_str(target_metric)
+  
+  matched_data <- data %>% filter(sapply(Metric, clean_str) == target_clean)
+  if(nrow(matched_data) > 0) return(matched_data)
+  
+  pretty_name <- names(metric_list)[metric_list == target_metric]
+  if(length(pretty_name) > 0) {
+    pretty_clean <- clean_str(pretty_name)
+    matched_data <- data %>% filter(sapply(Metric, clean_str) == pretty_clean)
+    if(nrow(matched_data) > 0) return(matched_data)
+  }
+  return(matched_data)
+}
+
+# --- 1. GENERATE EXECUTIVE SUMMARY (PARAGRAPH FORM) ---
+
+summary_sentences <- list()
+
+summary_sentences[[1]] <- "This executive summary highlights the key findings from the selected data metrics, focusing on the highest recorded values for each category. "
+
+for (m in params$metrics) {
+  clean_name <- names(params$metric_names)[params$metric_names == m]
+  if(length(clean_name) == 0) clean_name <- m
+  
+  dat <- get_metric_data(params$data, m, params$metric_names)
+  
+  if (nrow(dat) > 0) {
+    top_row <- dat %>% 
+      filter(!tolower(Category) %in% c("total", "grand total", "sum")) %>%
+      arrange(desc(Value)) %>% slice(1)
+      
+    if(nrow(top_row) == 0) top_row <- dat %>% arrange(desc(Value)) %>% slice(1)
+    
+    val_formatted <- format(top_row$Value, big.mark=",")
+    
+    # Narrative sentence for Executive Summary
+    current_sentence <- paste0(
+      "Regarding ", tags$strong(clean_name), 
+      ", the highest figure was observed in ", tags$strong(top_row$Category), 
+      " with a total of ", tags$strong(val_formatted), ". "
+    )
+    summary_sentences[[length(summary_sentences) + 1]] <- HTML(current_sentence)
+  }
+}
+
+summary_paragraph <- do.call(tagList, summary_sentences)
+
+summary_section <- tags$div(
+  style = "background-color: #f8f9fa; border-left: 5px solid #003366; padding: 20px; margin-bottom: 30px; border-radius: 5px; line-height: 1.6; font-size: 1.05rem; color: #333;",
+  h3("Executive Summary", style="margin-top:0; color: #003366; margin-bottom: 15px;"),
+  tags$p(summary_paragraph, style="margin-bottom: 0;")
+)
+
+
+# --- 2. GENERATE GRAPHS WITH DESCRIPTIONS ---
+
+graph_list <- list()
+
+for (i in seq_along(params$metrics)) {
+  
+  current_metric <- params$metrics[[i]]
+  clean_name <- names(params$metric_names)[params$metric_names == current_metric]
+  if(length(clean_name) == 0) clean_name <- current_metric
+
+  plot_data <- get_metric_data(params$data, current_metric, params$metric_names)
+
+  if (nrow(plot_data) == 0) {
+    # Empty State
+    graph_list[[i]] <- tagList(
+      h3(clean_name),
+      p(em("No data available for this selection.")),
+      hr()
+    )
+  } else {
+    
+    # --- A. Generate Description Text ---
+    # Find statistics for the narrative
+    top_cat <- plot_data %>% arrange(desc(Value)) %>% slice(1)
+    bottom_cat <- plot_data %>% arrange(Value) %>% slice(1)
+    total_val <- sum(plot_data$Value, na.rm=TRUE)
+    
+    description_text <- paste0(
+      "The chart above illustrates the distribution for ", tags$b(clean_name), ". ",
+      "The data indicates that ", tags$b(top_cat$Category), " holds the highest share with ", 
+      format(top_cat$Value, big.mark=","), " instances. ",
+      "Conversely, ", tags$b(bottom_cat$Category), " represents the lowest value in this dataset with ", 
+      format(bottom_cat$Value, big.mark=","), ". ",
+      "The total recorded count across all displayed categories is ", format(total_val, big.mark=","), "."
+    )
+
+    # --- B. Generate Plot ---
+    p <- plot_ly(
+      data = plot_data,
+      y = ~Category,
+      x = ~Value,
+      type = 'bar',
+      orientation = 'h',
+      marker = list(color = '#003366')
+    ) %>%
+      layout(
+        title = "",
+        xaxis = list(title = "Value"),
+        yaxis = list(title = "")
+      )
+    
+    # --- C. Combine into Section ---
+    graph_list[[i]] <- tagList(
+      h3(clean_name, style="margin-top: 30px; color: #003366;"), # Metric Title
+      p,                                                         # The Graph
+      tags$div(                                                  # The Description Box
+        style="margin-top: 15px; padding: 15px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px; color: #555;",
+        tags$b("Analysis:"), HTML(description_text)
+      ),
+      hr(style="margin-top: 30px; border-top: 2px solid #eee;")  # Separator
+    )
+  }
+}
+
+# --- 3. FINAL OUTPUT ---
+tagList(
+  summary_section, 
+  graph_list
+)
+```

@@ -1,0 +1,87 @@
+NAME_1,Region,Congestion.Index
+Apayao,CAR,0.312110482
+Abra,CAR,0.312110482
+Benguet,CAR,0.312110482
+Ifugao,CAR,0.312110482
+MountainProvince,CAR,0.312110482
+Kalinga,CAR,0.312110482
+AgusandelNorte,CARAGA,0.477378891
+AgusandelSur,CARAGA,0.477378891
+SurigaodelSur,CARAGA,0.477378891
+DinagatIslands,CARAGA,0.477378891
+SurigaodelNorte,CARAGA,0.477378891
+NcrThirdDistrict,NCR,0.811316953
+NcrSecondDistrict,NCR,0.811316953
+NcrFourthDistrict,NCR,0.811316953
+MetropolitanManila,NCR,0.811316953
+IlocosSur,Region I,0.391853159
+Pangasinan,Region I,0.391853159
+LaUnion,Region I,0.391853159
+IlocosNorte,Region I,0.391853159
+Quirino,Region II,0.414921451
+Cagayan,Region II,0.414921451
+Isabela,Region II,0.414921451
+NuevaVizcaya,Region II,0.414921451
+Batanes,Region II,0.414921451
+Zambales,Region III,0.581683624
+Pampanga,Region III,0.581683624
+NuevaEcija,Region III,0.581683624
+Bulacan,Region III,0.581683624
+Tarlac,Region III,0.581683624
+Aurora,Region III,0.581683624
+Bataan,Region III,0.581683624
+Batangas,Region IV-A,0.640963235
+Laguna,Region IV-A,0.640963235
+Cavite,Region IV-A,0.640963235
+Quezon,Region IV-A,0.640963235
+Rizal,Region IV-A,0.640963235
+Palawan,MIMAROPA,0.491828105
+OrientalMindoro,MIMAROPA,0.491828105
+Marinduque,MIMAROPA,0.491828105
+Romblon,MIMAROPA,0.491828105
+OccidentalMindoro,MIMAROPA,0.491828105
+ZamboangadelNorte,Region IX,0.474783094
+CityOfIsabela,Region IX,0.474783094
+ZamboangadelSur,Region IX,0.474783094
+ZamboangaSibugay,Region IX,0.474783094
+CamarinesSur,Region V,0.493151832
+Albay,Region V,0.493151832
+Masbate,Region V,0.493151832
+Catanduanes,Region V,0.493151832
+Sorsogon,Region V,0.493151832
+CamarinesNorte,Region V,0.493151832
+Aklan,Region VI,0.411047892
+Antique,Region VI,0.411047892
+NegrosOccidental,Region VI,0.411047892
+Capiz,Region VI,0.411047892
+Guimaras,Region VI,0.411047892
+Iloilo,Region VI,0.411047892
+NegrosOriental,Region VII,0.531427573
+Cebu,Region VII,0.531427573
+Bohol,Region VII,0.531427573
+Siquijor,Region VII,0.531427573
+Leyte,Region VIII,0.377994415
+Biliran,Region VIII,0.377994415
+EasternSamar,Region VIII,0.377994415
+Samar,Region VIII,0.377994415
+SouthernLeyte,Region VIII,0.377994415
+NorthernSamar,Region VIII,0.377994415
+Bukidnon,Region X,0.571691899
+MisamisOriental,Region X,0.571691899
+Camiguin,Region X,0.571691899
+LanaodelNorte,Region X,0.571691899
+MisamisOccidental,Region X,0.571691899
+DavaodelSur,Region XI,0.561240542
+CompostelaValley,Region XI,0.561240542
+DavaodelNorte,Region XI,0.561240542
+DavaoOccidental,Region XI,0.561240542
+DavaoOriental,Region XI,0.561240542
+SouthCotabato,Region XII,0.618008776
+NorthCotabato,Region XII,0.618008776
+Sarangani,Region XII,0.618008776
+SultanKudarat,Region XII,0.618008776
+Basilan,BARMM,0.760962871
+LanaodelSur,BARMM,0.760962871
+Maguindanao,BARMM,0.760962871
+Sulu,BARMM,0.760962871
+Tawi-Tawi,BARMM,0.760962871
