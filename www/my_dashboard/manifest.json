@@ -1,0 +1,21 @@
+{
+    "name": "InsightEd",
+    "short_name": "InsightEd",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2a8c4a",
+    "description": "School Data Capture",
+    "icons": [
+        {
+            "src": "images/In-Site.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "images/In-Site.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>School Insights Data</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/In-Site.png">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#2a8c4a">
+</head>
+<body>
+
+    <section id="landingPage">
+        <h1>Welcome to InsightEd!</h1>
+        <p>Offline Data Collection Tool</p>
+        <button type="button" id="startSurveyBtn">School Data</button>
+    </section>
+
+    <section id="appContainer">
+
+        <header class="app-header">
+            <h1>STRIDE Data Entry Form</h1>
+            <p>This form can be filled out offline. Progress is saved automatically.</p>
+            
+            <div class="step-indicator">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+                <div class="step">5</div>
+                <div class="step">6</div>
+                <div class="step">7</div>
+                <div class="step">8</div>
+            </div>
+        </header>
+
+        <form id="surveyForm" class="form-container">
+            
+            <main class="content-area">
+                
+                <div class="form-page active" data-page="0">
+                    <h2>School Profile</h2>
+                    <div class="form-group">
+                        <label for="school_id">School ID:</label>
+                        <input type="text" id="school_id" name="school_id" placeholder="e.g. 193849">
+                    </div>
+                    <div class="form-group">
+                        <label for="school_name">School Name:</label>
+                        <input type="text" id="school_name" name="school_name" placeholder="e.g. Juan Dela Cruz Elementary School">
+                    </div>
+                    <div class="form-group">
+                        <label for="stride_region">Region:</label>
+                        <select id="stride_region" name="stride_region">
+                            <option value="">--- Select a Region ---</option>
+                            <option value="Region I">Region I</option>
+                            <option value="Region II">Region II</option>
+                            <option value="Region III">Region III</option>
+                            <option value="Region IV-A">Region IV-A</option>
+                            <option value="MIMAROPA">MIMAROPA</option>
+                            <option value="Region V">Region V</option>
+                            <option value="Region VI">Region VI</option>
+                            <option value="NIR">NIR</option>
+                            <option value="Region VII">Region VII</option>
+                            <option value="Region VIII">Region VIII</option>
+                            <option value="Region IX">Region IX</option>
+                            <option value="Region X">Region X</option>
+                            <option value="Region XI">Region XI</option>
+                            <option value="Region XII">Region XII</option>
+                            <option value="CARAGA">CARAGA</option>
+                            <option value="CAR">CAR</option>
+                            <option value="NCR">NCR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="stride_division">Division:</label>
+                        <select id="stride_division" name="stride_division">
+                            <option value="">--- Select Division ---</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="curricular_offering">Filter Curricular Offering:</label>
+                        <select id="curricular_offering" name="curricular_offering">
+                            <option value="">--- Select a Curricular Offering ---</option>
+                            <option value="Purely ES">Purely ES</option>
+                            <option value="Purely JHS">Purely JHS</option>
+                            <option value="Purely SHS">Purely SHS</option>
+                            <option value="JHS and SHS">JHS and SHS</option>
+                            <option value="ES and JHS">ES and JHS</option>
+                            <option value="All Offering">All Offering</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="1">
+                    <h2>School Information (School Head)</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4">
+                            <label for="school_head_gn">Given Name:</label>
+                            <input type="text" id="school_head_gn" name="school_head_gn" placeholder="Enter Given Name">
+                        </div>
+                        <div class="form-group form-col-4">
+                            <label for="school_head_mn">Middle Name:</label>
+                            <input type="text" id="school_head_mn" name="school_head_mn" placeholder="Enter Middle Name">
+                        </div>
+                        <div class="form-group form-col-4">
+                            <label for="school_head_ln">Last Name:</label>
+                            <input type="text" id="school_head_ln" name="school_head_ln" placeholder="Enter Last Name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="school_head_position">Plantilla Position:</label>
+                        <select id="school_head_position" name="school_head_position">
+                            <option value="School Principal I">School Principal I</option>
+                            <option value="School Principal II">School Principal II</option>
+                            <option value="School Principal III">School Principal III</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-col-6">
+                            <label for="school_head_contact">Contact Number:</label>
+                            <input type="tel" id="school_head_contact" name="school_head_contact" placeholder="e.g. 09129382923">
+                        </div>
+                        <div class="form-group form-col-6">
+                            <label for="school_head_contact_alt">Alternative Contact Number:</label>
+                            <input type="tel" id="school_head_contact_alt" name="school_head_contact_alt" placeholder="e.g. 09122314424">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-col-6">
+                            <label for="school_head_email">DepEd Email Address:</label>
+                            <input type="email" id="school_head_email" name="school_head_email" placeholder="e.g. juan.delacruz@deped.gov.ph">
+                        </div>
+                        <div class="form-group form-col-6">
+                            <label for="school_head_email_alt">Alternative Email Address:</label>
+                            <input type="email" id="school_head_email_alt" name="school_head_email_alt" placeholder="e.g. juan.delacruz@gmail.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="2">
+                    <h2>Enrolment per Grade Level</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4"><label for="g1">Grade 1:</label><input type="number" id="g1" name="g1" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g2">Grade 2:</label><input type="number" id="g2" name="g2" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g3">Grade 3:</label><input type="number" id="g3" name="g3" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g4">Grade 4:</label><input type="number" id="g4" name="g4" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g5">Grade 5:</label><input type="number" id="g5" name="g5" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g6">Grade 6:</label><input type="number" id="g6" name="g6" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g7">Grade 7:</label><input type="number" id="g7" name="g7" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g8">Grade 8:</label><input type="number" id="g8" name="g8" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g9">Grade 9:</label><input type="number" id="g9" name="g9" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g10">Grade 10:</label><input type="number" id="g10" name="g10" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g11">Grade 11:</label><input type="number" id="g11" name="g11" min="0"></div>
+                        <div class="form-group form-col-4"><label for="g12">Grade 12:</label><input type="number" id="g12" name="g12" min="0"></div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="3">
+                    <h2>Organized Classes per Grade Level</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4"><label for="org_g1">Grade 1:</label><input type="number" id="org_g1" name="org_g1" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g2">Grade 2:</label><input type="number" id="org_g2" name="org_g2" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g3">Grade 3:</label><input type="number" id="org_g3" name="org_g3" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g4">Grade 4:</label><input type="number" id="org_g4" name="org_g4" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g5">Grade 5:</label><input type="number" id="org_g5" name="org_g5" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g6">Grade 6:</label><input type="number" id="org_g6" name="org_g6" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g7">Grade 7:</label><input type="number" id="org_g7" name="org_g7" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g8">Grade 8:</label><input type="number" id="org_g8" name="org_g8" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g9">Grade 9:</label><input type="number" id="org_g9" name="org_g9" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g10">Grade 10:</label><input type="number" id="org_g10" name="org_g10" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g11">Grade 11:</label><input type="number" id="org_g11" name="org_g11" min="0"></div>
+                        <div class="form-group form-col-4"><label for="org_g12">Grade 12:</label><input type="number" id="org_g12" name="org_g12" min="0"></div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="4">
+                    <h2>Number of Teaching Personnel</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4"><label for="teaching_elem">Total ES Teachers:</label><input type="number" id="teaching_elem" name="teaching_elem" min="0"></div>
+                        <div class="form-group form-col-4"><label for="teaching_jhs">Total JHS Teachers:</label><input type="number" id="teaching_jhs" name="teaching_jhs" min="0"></div>
+                        <div class="form-group form-col-4"><label for="teaching_shs">Total SHS Teachers:</label><input type="number" id="teaching_shs" name="teaching_shs" min="0"></div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="5">
+                    <h2>School Infrastructure</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4"><label for="instructional_rooms_es">Classrooms for ES:</label><input type="number" id="instructional_rooms_es" name="instructional_rooms_es" min="0"></div>
+                        <div class="form-group form-col-4"><label for="instructional_rooms_jhs">Classrooms for JHS:</label><input type="number" id="instructional_rooms_jhs" name="instructional_rooms_jhs" min="0"></div>
+                        <div class="form-group form-col-4"><label for="instructional_rooms_shs">Classrooms for SHS:</label><input type="number" id="instructional_rooms_shs" name="instructional_rooms_shs" min="0"></div>
+                        <div class="form-group form-col-4"><label for="instructional_rooms_repair">Classrooms for Repair:</label><input type="number" id="instructional_rooms_repair" name="instructional_rooms_repair" min="0"></div>
+                        <div class="form-group form-col-4"><label for="buildings">Number of Buildings:</label><input type="number" id="buildings" name="buildings" min="0"></div>
+                        <div class="form-group form-col-4"><label for="buildings_repair">Buildings for Repair:</label><input type="number" id="buildings_repair" name="buildings_repair" min="0"></div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="6">
+                    <h2>School Resources</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-3"><label for="laptops">Laptops:</label><input type="number" id="laptops" name="laptops" min="0"></div>
+                        <div class="form-group form-col-3"><label for="laptops_repair">Laptops for Repair:</label><input type="number" id="laptops_repair" name="laptops_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="chairs">Chairs:</label><input type="number" id="chairs" name="chairs" min="0"></div>
+                        <div class="form-group form-col-3"><label for="chairs_repair">Chairs for Repair:</label><input type="number" id="chairs_repair" name="chairs_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="desk">Desks:</label><input type="number" id="desk" name="desk" min="0"></div>
+                        <div class="form-group form-col-3"><label for="desk_repair">Desks for Repair:</label><input type="number" id="desk_repair" name="desk_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="ecart">e-carts:</label><input type="number" id="ecart" name="ecart" min="0"></div>
+                        <div class="form-group form-col-3"><label for="ecart_repair">e-carts for Repair:</label><input type="number" id="ecart_repair" name="ecart_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="toilet">Toilets:</label><input type="number" id="toilet" name="toilet" min="0"></div>
+                        <div class="form-group form-col-3"><label for="toilet_repair">Toilets for Repair:</label><input type="number" id="toilet_repair" name="toilet_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="printer">Printers:</label><input type="number" id="printer" name="printer" min="0"></div>
+                        <div class="form-group form-col-3"><label for="printer_repair">Printers for Repair:</label><input type="number" id="printer_repair" name="printer_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="tv">TVs:</label><input type="number" id="tv" name="tv" min="0"></div>
+                        <div class="form-group form-col-3"><label for="tv_repair">TVs for Repair:</label><input type="number" id="tv_repair" name="tv_repair" min="0"></div>
+                        <div class="form-group form-col-3"><label for="science_lab">Science Labs:</label><input type="number" id="science_lab" name="science_lab" min="0"></div>
+                        <div class="form-group form-col-3"><label for="computer_lab">Computer Labs:</label><input type="number" id="computer_lab" name="computer_lab" min="0"></div>
+                        <div class="form-group form-col-3"><label for="tvl_lab">TVL Labs:</label><input type="number" id="tvl_lab" name="tvl_lab" min="0"></div>
+                    </div>
+                </div>
+
+                <div class="form-page" data-page="7">
+                    <h2>Teacher Specialization</h2>
+                    <div class="form-row">
+                        <div class="form-group form-col-4"><label for="english">English:</label><input type="number" id="english" name="english" min="0"></div>
+                        <div class="form-group form-col-4"><label for="math">Math:</label><input type="number" id="math" name="math" min="0"></div>
+                        <div class="form-group form-col-4"><label for="science">Science:</label><input type="number" id="science" name="science" min="0"></div>
+                        <div class="form-group form-col-4"><label for="biological_science">Biological Science:</label><input type="number" id="biological_science" name="biological_science" min="0"></div>
+                        <div class="form-group form-col-4"><label for="physical_science">Physical Science:</label><input type="number" id="physical_science" name="physical_science" min="0"></div>
+                        <div class="form-group form-col-4"><label for="general_education">General Education:</label><input type="number" id="general_education" name="general_education" min="0"></div>
+                        <div class="form-group form-col-4"><label for="araling_panlipunan">Araling Panlipunan:</label><input type="number" id="araling_panlipunan" name="araling_panlipunan" min="0"></div>
+                        <div class="form-group form-col-4"><label for="tle">TLE:</label><input type="number" id="tle" name="tle" min="0"></div>
+                        <div class="form-group form-col-4"><label for="mapeh">MAPEH:</label><input type="number" id="mapeh" name="mapeh" min="0"></div>
+                        <div class="form-group form-col-4"><label for="filipino">Filipino:</label><input type="number" id="filipino" name="filipino" min="0"></div>
+                        <div class="form-group form-col-4"><label for="esp">ESP:</label><input type="number" id="esp" name="esp" min="0"></div>
+                        <div class="form-group form-col-4"><label for="agriculture">Agriculture:</label><input type="number" id="agriculture" name="agriculture" min="0"></div>
+                        <div class="form-group form-col-4"><label for="ece">Early Childhood Ed:</label><input type="number" id="ece" name="ece" min="0"></div>
+                        <div class="form-group form-col-4"><label for="sped">SPED:</label><input type="number" id="sped" name="sped" min="0"></div>
+                    </div>
+                </div>
+
+            </main>
+
+            <footer class="button-footer">
+                <div class="form-navigation">
+                    <button type="button" id="prevBtn" class="nav-btn" style="display: none;">Previous</button>
+                    <button type="button" id="nextBtn" class="nav-btn">Next</button>
+                    <button type="submit" id="submitBtn" style="display: none;">Submit Survey</button>
+                </div>
+                <button type="button" id="clearFormBtn" class="clear-btn">Clear Entire Form</button>
+            </footer>
+
+        </form>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>

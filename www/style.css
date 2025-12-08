@@ -1,0 +1,673 @@
+/* General Body & Font Styles */
+body {
+  background-color: #f9fafc;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding-bottom: 60px; /* leave space for footer */
+  opacity: 1;
+  overflow-x: hidden !important; /* Prevent horizontal scroll */
+  width: 100%; /* Prevent horizontal scroll */
+}
+
+* {
+  font-family: 'Poppins', sans-serif;
+}
+
+html {
+  overflow-x: hidden !important; /* Prevent horizontal scroll */
+}
+
+/* Login Page Specific Styles */
+body.login-bg {
+  background: none; /* Gradient is applied separately */
+  color: white;
+}
+
+/* Animated Gradient Background for Login */
+.login-bg.gradient-animated {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  z-index: -1;
+  background: linear-gradient(-45deg, #113967, #c9c9c9, #dcd6cd, #0075ff);
+  background-size: 200% 200%;
+  animation: depedGradient 25s ease infinite; /* Slower */
+  overflow: hidden; /* Prevent scroll */
+}
+
+@keyframes depedGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Login Container & Layout */
+.login-container {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  z-index: 1; /* Sits above bubbles/gradient */
+}
+
+.login-left {
+  flex: 1;
+  color: #333; /* Color for text over gradient */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease; /* For register panel enlarge */
+}
+
+.login-text-box { /* Container for left-side text/logos */
+  position: relative;
+  z-index: 2;
+}
+
+.login-left-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.left-logo {
+  height: 161px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  margin-right: 297px;
+}
+
+
+/* STRIDE Logo Text Styling (Login Left) */
+.stride-logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 12rem; /* Consider reducing if too large */
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: -5px 3px 2px #e0e4ce;
+  position: relative;
+  gap: 0.05em;
+}
+
+.stride-str { color: #003366; /* DepEd blue */ }
+.stride-ide { color: #D62828; /* DepEd red */ }
+
+.stride-logo-i { /* Image used for 'I' */
+  height: 444px;
+    vertical-align: middle;
+    margin: -70px 36px;
+    transition: transform 0.3s ease;
+    margin-top: -183px;
+    filter: drop-shadow(3px 1px 13px white);
+}
+
+/* Login Slogans */
+.slogan-mid {
+  margin-top: -143px;
+  font-size: 45px;
+  color: #a38200;
+  font-weight: 900;
+  text-shadow: 0px 3px #fffde4;
+  letter-spacing: 2px;
+  font-style: italic;
+}
+
+.slogan-bottom-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 32px;
+  font-weight: 500;
+  margin-top: -24px;
+  text-shadow: 0px 3px #fffde4;
+}
+
+.slogan-left { color: #2c3895; font-weight: 900; /* deep blue */ }
+.slogan-right { color: #d62828; font-weight: 900; /* red */ }
+
+.slogan-login-top {
+    margin-top: 19px;
+    font-weight: 700;
+    font-size: 25px;
+    margin-bottom: 15px;
+    color: #002d62;
+}
+
+.slogan-login-bottom {
+    font-size: 15px;
+    margin-bottom: 22px;
+    margin-top: 16px;
+}
+
+/* Login Card Styling (Right Side) */
+.login-card {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px 35px;
+  border-radius: 20px;
+  box-shadow: 13px 12px 3px rgb(0 0 0 / 19%);
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  backdrop-filter: blur(6px);
+  overflow: hidden; /* For transition animation */
+}
+
+.login-logo-top { /* Logo inside login card */
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 992px) {
+  .login-logo-top {
+    width: 304px;
+    margin-bottom: 5px;
+    margin-top: -25px;
+  }
+}
+
+/* Input Fields */
+#auth input, #auth select { /* Target inputs/selects inside auth module */
+  border-radius: 10px !important;
+  border: 1px solid #ccc !important;
+  padding: 10px 12px !important;
+  margin-bottom: 10px !important;
+  width: 100% !important;
+  font-size: 1rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+#auth input:focus {
+  border-color: #17428C !important; /* DepEd Blue */
+  box-shadow: 0 0 0 3px rgba(23, 66, 140, 0.15);
+}
+
+/* Password toggle styles */
+.input-group .toggle-password {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-left: 1px solid #e0e0e0;
+  background: transparent;
+  color: #495057;
+  border-radius: 0 8px 8px 0;
+}
+.input-group .toggle-password i { font-size: 1rem; }
+.input-group .form-control { border-radius: 8px 0 0 8px; }
+
+
+/* Buttons (Login/Register/Guest) */
+#auth .btn, #auth-do_login, #auth-do_register, .btn-login {
+  background-color: #17428C !important; /* DepEd Blue */
+  color: white !important;
+  border-radius: 10px !important;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600 !important;
+  margin-top: 10px;
+  border: none !important;
+  width: 100%;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#auth .btn:hover, .btn-login:hover {
+  background-color: #0e2c60 !important; /* Darker Blue */
+  transform: translateY(-2px);
+}
+
+/* Guest Button Specifics (if needed, otherwise inherits from .btn) */
+#auth-guest_mode {
+  background-color: #6c757d !important; /* Bootstrap secondary grey */
+  /* Add hover effect if desired */
+}
+#auth-guest_mode:hover {
+   background-color: #5a6268 !important;
+}
+
+
+/* Links (Register/Back to Login) */
+.register-link {
+  display: block; /* Ensure it takes full width for centering if needed */
+  margin-top: 10px; /* Add some space above */
+  color: #0d6efd; /* Standard link blue */
+  text-decoration: none;
+}
+.register-link:hover {
+  text-decoration: underline;
+}
+
+/* Bottom Logos */
+.login-logos-bottom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.bottom-logo {
+  width: 60px;
+  opacity: 0.9;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.bottom-logo:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Hiding default auth module card styles */
+#auth-card, #auth-card > div:first-child, #auth-card h4,
+#auth-card .card-header, #auth-card .card-title,
+#auth .card-header, #auth .card-title, #auth h4 {
+  display: none !important;
+}
+#auth .card {
+  background: transparent !important; box-shadow: none !important;
+  border: none !important; padding: 0 !important;
+}
+#auth .card-body { padding: 0 !important; }
+
+/* Login/Register Form Transition */
+.auth-form {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.6s ease-in-out;
+  position: absolute; /* Needed for transition */
+  width: 100%; top: 0; left: 0;
+  padding: inherit; /* Inherit padding from .login-card */
+}
+
+.auth-form.active {
+  opacity: 1;
+  transform: translateX(0);
+  z-index: 2; /* Bring active form to front */
+  position: relative; /* Take up space in layout */
+}
+
+/* Keyframes for sliding */
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-100%); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
+
+/* Apply animations */
+.auth-form:nth-child(1).active { animation: slideInLeft 0.6s ease forwards; }
+.auth-form:nth-child(2).active { animation: slideInRight 0.6s ease forwards; }
+
+/* Registration Specific Layout */
+.register-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px; /* Adjust as needed */
+  margin: auto;
+  padding-top: 1rem;
+}
+
+.engineer-panel { /* Left panel for HR/Engineer */
+  flex: 0 0 35%; /* Adjust width ratio */
+  animation: slideInLeft 0.4s ease-out; /* Match animation name if needed */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.95); /* Match login card */
+  padding: 20px 25px;
+  border-radius: 12px;
+}
+
+.login-right.flex-grow-1 { /* Ensure right panel grows */
+  flex-grow: 1;
+}
+
+/* Enlarge register panel on condition */
+.enlarge-panel .login-right {
+  /* This might conflict with flex layout, consider adjusting .register-wrapper width instead */
+  /* transform: scale(1.12); */
+  transition: transform 0.4s ease;
+}
+
+
+/* Dashboard General Styles */
+body.dashboard-bg {
+  background-color: #f9fafc; /* Light grey background */
+  background-image: none;
+  color: #333; /* Default text color */
+}
+
+/* Optional subtle background pattern/overlay */
+body.dashboard-bg::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #acbfd6; /* Light blue-grey tint */
+  opacity: 0.1; /* Very subtle */
+  z-index: -1;
+}
+
+/* General Card Styling */
+.card {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow: visible;
+  white-space: normal;
+  font-weight: bolder;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 2px 1px 3px 0px rgba(0, 0, 0, 0.2); /* Softened shadow */
+  border-radius: 10px; /* Consistent rounding */
+  border: none; /* Remove default border */
+  margin-bottom: 1rem; /* Space between cards */
+}
+
+.card-header { /* Style for dashboard section titles */
+  background: linear-gradient(90deg, #002D62, #004c99); /* DepEd Blue gradient */
+  color: #ffffff !important;
+  font-weight: 900;
+  font-size: 18px; /* Slightly adjusted size */
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Softer shadow */
+  border-radius: 10px 10px 0 0 !important; /* Match card rounding, override */
+  text-align: center;
+  padding: 10px 15px;
+  /* Removed box-shadow as card has one */
+}
+.card-header:first-child { /* Override default first-child rule if needed */
+   font-size: 18px; /* Consistent size */
+   /* Keep other specific styles from previous block */
+}
+
+
+/* Accordion Button Styling */
+.accordion .accordion-button:not(.collapsed) {
+  box-shadow: none;
+  font-weight: bolder;
+  font-size: 18px; /* Adjusted size */
+  color: #ffffff;
+  text-shadow: 1px 1px 1px black; /* Softer shadow */
+  background-color: #002D62; /* DepEd Blue */
+}
+
+/* Value Box Styling */
+.bslib-value-box { /* Target bslib value boxes specifically */
+  background-color: #f0f4ff; /* Light blue background */
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Softer shadow */
+  transition: transform 0.2s ease;
+  height: 100%; /* Make boxes fill column height */
+}
+.bslib-value-box:hover { transform: translateY(-3px); }
+
+.bslib-value-box h6.value-box-title {
+  font-weight: 700 !important; /* Bold but not excessive */
+  font-size: 1em !important;   /* Standard size */
+  color: #ffffff !important;   /* DepEd blue */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: none; /* Removed shadow for cleaner look */
+  white-space: normal !important; /* Allow wrapping */
+  line-height: 1.2; /* Adjust line height */
+}
+.bslib-value-box h6.value-box-value {
+  font-weight: 800 !important; /* Bold number */
+  font-size: 2em !important; /* Larger number */
+  color: #ffffff !important; /* Slightly lighter blue */
+  text-shadow: none; /* Removed shadow */
+}
+
+/* Sidebar Styling */
+.bslib-sidebar-layout > .sidebar {
+  background: linear-gradient(180deg, #003366 0%, #003366 100%); /* DepEd Blue */
+  color: #fff !important;
+  border-right: 3px solid #FFD43B; /* DepEd Yellow border */
+  /* Sticky positioning - KEEP THIS if using sidebar layout */
+  position: -webkit-sticky !important; position: sticky !important;
+  top: 60px; /* Adjust this based on your FINAL navbar height */
+  align-self: flex-start;
+
+  /* --- THIS IS THE FIX --- */
+  /* Change 'max-height' to 'height' */
+  height: calc(100vh - 60px); /* Adjust based on top offset */
+  
+  overflow-y: auto !important;
+  z-index: 10; /* Below navbar */
+  scrollbar-width: thin; scrollbar-color: #002D62 #f9fafc;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  padding-top: 1rem; /* Add padding back if needed */
+  margin: 0 !important; /* Remove gaps */
+}
+
+.bslib-sidebar-layout .sidebar .sidebar-title {
+  color: #FFD43B !important; /* Yellow */
+  text-transform: uppercase; font-weight: 700;
+  letter-spacing: 1px; text-align: center;
+  font-size: 24px; /* Adjusted size */
+  text-shadow: 1px 1px 2px black;
+}
+
+/* Sidebar Content (specific rules if needed) */
+.bslib-sidebar-layout > .sidebar > .sidebar-content {
+  background: transparent; /* Inherit from .sidebar */
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; /* Slightly adjusted */
+  color: #FFFFFF;
+  font-weight: 600; /* Adjusted weight */
+  text-align: center;
+  overflow-y: visible !important; /* Check if really needed */
+}
+
+/* Footer Styling */
+.app-footer {
+  background-color: #f1f1f1;
+  color: #444;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid #ccc;
+  font-size: 0.9em;
+  z-index: 0 !important; /* High z-index */
+}
+
+/* Loading Overlay */
+#loading-overlay {
+  position: fixed !important; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: #ffffff;
+  display: flex; /* Use flex to center content */
+  align-items: center;
+  justify-content: center;
+  z-index: 100000 !important;
+  transition: opacity 0.8s ease-in-out;
+  /* Ensure it's hidden initially if controlled by JS */
+  /* display: none; */ /* Uncomment if JS doesn't hide it fast enough */
+}
+#loading-overlay > div { /* Center the inner div content */
+  text-align: center;
+  color: black; font-size: 1.3em;
+}
+
+/* Login State Body Classes */
+body.login-hidden .app-footer { /* Hide footer when logged out */
+  display: none !important;
+}
+body.login-hidden .bslib-navbar,
+body.login-hidden .navbar { /* Ensure navbar is at top when header is hidden */
+  top: 0 !important;
+}
+
+/* Hide footer initially */
+.app-footer { display: none; }
+/* Show footer when authenticated */
+body.show-header-footer .app-footer { display: block !important; /* Or flex, depending on content */ }
+
+
+/* School Details Tables */
+#schooldetails th, #schooldetails td,
+#schooldetails2 th, #schooldetails2 td,
+#schooldetails3 th, #schooldetails3 td,
+#schooldetails5 th, #schooldetails5 td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  font-size: 0.9em; /* Adjust font size if needed */
+}
+#schooldetails th, #schooldetails2 th, #schooldetails3 th, #schooldetails5 th {
+  font-weight: 700; /* Adjusted weight */
+  background-color: #002D62; /* DepEd Blue */
+  color: #ffffff;
+}
+#schooldetails tr:nth-child(even), #schooldetails2 tr:nth-child(even),
+#schooldetails3 tr:nth-child(even), #schooldetails5 tr:nth-child(even) {
+  background-color: #f9f9f9; /* Zebra striping */
+}
+
+/* Animations (Keep if desired) */
+@keyframes sidebarSlideIn { 0% { opacity: 0; transform: translateX(-30px); } 100% { opacity: 1; transform: translateX(0); } }
+@keyframes cardFadeUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes bodyFadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes cardUp { to { opacity: 1; transform: translateY(0); } }
+
+.bslib-sidebar-layout > .sidebar { animation: sidebarSlideIn 0.6s ease-out; }
+.bslib-sidebar-layout > .sidebar .card {
+  opacity: 0; transform: translateY(10px);
+  animation: cardFadeUp 0.6s ease forwards; animation-delay: 0.3s;
+}
+.bslib-sidebar-layout > .main { animation: bodyFadeIn 0.7s ease-out; animation-delay: 0.1s; }
+.bslib-sidebar-layout > .main .card {
+  opacity: 0; transform: translateY(15px);
+  animation: cardUp 0.6s ease forwards; animation-delay: 0.3s;
+}
+
+/* Utility to remove container padding (use cautiously) */
+.container, .container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
+  --bs-gutter-x: 0; /* Removes horizontal padding */
+}
+
+@media (min-width: 992px) {
+    .navbar-expand-lg,.navbar:not(.navbar-expand):not(.navbar-expand-sm):not(.navbar-expand-md):not(.navbar-expand-lg):not(.navbar-expand-xl) {
+        flex-wrap:nowrap;
+        -webkit-flex-wrap: nowrap;
+        justify-content: flex-start;
+        border-bottom: 7px solid #003366 !important;
+        -webkit-justify-content: flex-start;
+        height: 108px;
+    }
+    
+*,*::before,*::after {
+    box-sizing: border-box;
+    margin-block: -1px;}
+
+@media (prefers-reduced-motion: no-preference) {
+    :root {
+        scroll-behavior: smooth
+    }
+    
+@media (min-width: 992px) {
+    .navbar-expand-lg .navbar-nav, .navbar:not(.navbar-expand):not(.navbar-expand-sm):not(.navbar-expand-md):not(.navbar-expand-lg):not(.navbar-expand-xl) .navbar-nav
+Specificity: (0,2,0)
+ {
+        flex-direction: row;
+        -webkit-flex-direction: row;
+        margin-right: 20px;
+    }
+}
+    
+/* ==== FIX: RESOURCE TYPE RADIO BUTTON ALIGNMENT ==== */
+#resource_type_selection {
+  text-align: left !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding-left: 15px;
+}
+
+/* Make sure each radio button stacks neatly left */
+#resource_type_selection .shiny-options-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important;
+  gap: 6px; /* adds small spacing between items */
+}
+
+/* Align labels and text cleanly */
+#resource_type_selection .radio label,
+#resource_type_selection label,
+#resource_type_selection span {
+  text-align: left !important;
+  font-weight: 600;
+  color: #002D62; /* optional – DepEd blue */
+}
+
+/* Responsive Grid System */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* Responsive Cards */
+.card {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Tables */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+  
+  .login-left, .login-right {
+    width: 100%;
+  }
+  
+  .stride-logo-text {
+    font-size: 6rem;
+  }
+  
+  .slogan-mid {
+    font-size: 28px;
+  }
+  
+  .slogan-bottom-row {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .bslib-value-box {
+  }
+  
+  .login-card {
+    padding: 20px 15px;
+    margin: 10px;
+  }
+}
+    
+    
+.guest_mode_btn{
+  color:yellow;
+}
