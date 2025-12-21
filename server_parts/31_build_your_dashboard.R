@@ -1515,7 +1515,7 @@ output$schooldetails_classroom_needs <- renderTable({
     Metric = c("Classroom Requirement", "Estimated Shortage", "Major Repairs Needed", 
                "Shifting Schedule", "Buildable Space Available"),
     Value = as.character(c(
-      data$Classroom.Requirement, data$Est.CS, data$Major.Repair.2023.2024,
+      data$Classroom.Requirement, data$Classroom.Shortage, data$Major.Repair.2023.2024,
       data$Shifting, buildable_val
     ))
   )

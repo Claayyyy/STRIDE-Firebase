@@ -542,7 +542,7 @@ output$qs_classroom_needs <- renderTable({
     Metric = c("Classroom Requirement", "Estimated Shortage", "Major Repairs Needed", 
                "Shifting Schedule", "Buildable Space Available"),
     Value = as.character(c(
-      data$Classroom.Requirement, data$Est.CS, data$Major.Repair.2023.2024,
+      data$Classroom.Requirement, data$Classroom.Shortage, data$Major.Repair.2023.2024,
       data$Shifting, buildable_val
     ))
   )
@@ -694,7 +694,7 @@ output$download_school_profile <- downloadHandler(
       
       df_infra <- create_filtered_table(
         c("Total Buildings", "Total Classrooms", "Classroom Requirement", "Estimated Shortage", "Major Repairs Needed", "Shifting Schedule", "Buildable Space Available", "Electricity Source", "Water Source", "Ownership Type", "Total Seats", "Seats Shortage"),
-        c(data$Buildings, data$Instructional.Rooms.2023.2024, data$Classroom.Requirement, data$Est.CS, data$Major.Repair.2023.2024, data$Shifting, buildable_val, data$ElectricitySource, data$WaterSource, data$OwnershipType, data$Total.Seats.2023.2024, data$Total.Seats.Shortage.2023.2024)
+        c(data$Buildings, data$Instructional.Rooms.2023.2024, data$Classroom.Requirement, data$Classroom.Shortage, data$Major.Repair.2023.2024, data$Shifting, buildable_val, data$ElectricitySource, data$WaterSource, data$OwnershipType, data$Total.Seats.2023.2024, data$Total.Seats.Shortage.2023.2024)
       )
       
       df_spec <- create_filtered_table(

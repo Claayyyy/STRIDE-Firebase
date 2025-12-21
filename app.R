@@ -42,7 +42,8 @@ df <- read_parquet("School-Level-v2.parquet")
 
 uni45k <- read_parquet("School-Unique-v2.parquet") %>% 
   mutate(Municipality = stringr::str_to_title(Municipality)) %>% 
-  mutate(Leg.Mun = sprintf("%s (%s)", Legislative.District, Municipality))
+  mutate(Leg.Mun = sprintf("%s (%s)", Legislative.District, Municipality)) %>% 
+  rename(Est.CS.Depre = Est.CS)
 
 uni <- left_join(uni48k, uni45k, by = "SchoolID") %>% 
   mutate(
@@ -88,6 +89,9 @@ LMS <- read_parquet("EFD-LMS-GIDCA-NSBI2023.parquet") %>%
   left_join(
     uni %>% select(SchoolID, Latitude, Longitude), 
     by = c("School_ID" = "SchoolID")
+  ) %>% 
+  mutate(
+    Region = if_else(Region == "Region IV-B", "MIMAROPA", Region)
   )
 geojson_data <- geojson_read("gadm41_PHL_1.json", what = "sp")
 geojson_table <- as.data.frame(geojson_data)
