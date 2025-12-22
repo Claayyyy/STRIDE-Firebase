@@ -1312,7 +1312,20 @@ output$dashboard_grid <- renderUI({
   # --- 3. Arrange the cards into the layout (Logic Unchanged) ---
   plot_grid <- do.call(bslib::layout_columns, c(list(col_widths = 4), plot_cards))
   tagList(
-    tags$h3("Interactive Education Resource Dashboard", style = "text-align: center; font-weight: bold; margin-bottom: 20px;"),
+    # 1. Main Title
+    # CHANGE: Reduced margin-bottom from 15px to 5px to pull the box closer
+    tags$h3("Interactive Education Resource Dashboard", 
+            style = "text-align: center; font-weight: bold; margin-bottom: 5px;"),
+    
+    # 2. Instruction Note Box (Centered, Styled, & Italicized)
+    tags$div(
+      style = "display: flex; justify-content: center; margin-bottom: 20px;",
+      tags$div(
+        # CHANGE: Added 'font-style: italic;'
+        style = "background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 8px 20px; border-radius: 5px; font-size: 1rem; font-style: italic;",
+        tags$strong("Instructions:"), " Click on the bars to drilldown on any specific location then use the School Locator tab above to look for any specific school"
+      )
+    ),
     tags$div(
       style = "text-align: center; font-size: 1.1em; font-weight: 500; color: #333; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 10px; margin-bottom: 20px;",
       textOutput("current_filter_text")
