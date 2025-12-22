@@ -244,7 +244,7 @@ output$STRIDE2 <- renderUI({
         style = "cursor: pointer; font-weight: 600; color: #003366; display: flex; align-items: center; transition: color 0.2s;",
         onmouseover = "this.style.color='#CE1126'", # Red on hover
         onmouseout = "this.style.color='#003366'",
-        bs_icon("journal-bookmark"), tags$span("Quick Start", style="margin-left: 5px;")
+        bs_icon("journal-bookmark"), tags$span("Quick Guide", style="margin-left: 5px;")
       )
     ),
     
@@ -1663,7 +1663,29 @@ output$STRIDE2 <- renderUI({
           )
         ) # End layout_sidebar
       ) # End nav_panel
-    ) # End Data Explorer nav_menu
+    ),
+    
+    nav_panel(
+      title = tags$b("Contact Us"),
+      icon = bs_icon("envelope"),
+      h3("Contact Information"),
+      fluidRow(
+        column(12,
+               tags$iframe(
+                 id = "googleform",
+                 src = "https://docs.google.com/forms/d/e/1FAIpQLScmWmVzlAHgsitxUncINy4OC_5gkyg2LvYcJAkAGlGAzQHNvw/viewform?embedded=true", # Replace YOUR_FORM_ID
+                 width = "100%", # Or a specific pixel value like "760"
+                 height = "700px", # Or a specific pixel value like "500"
+                 frameborder = "0",
+                 marginheight = "0",
+                 marginwidth = "0")
+        )
+      )
+    )
+    
+    
+    
+    # End Data Explorer nav_menu
     # 
     # # --- mySTRIDE PANEL ---
     # nav_panel(
