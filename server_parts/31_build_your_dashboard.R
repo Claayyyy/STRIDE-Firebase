@@ -1440,9 +1440,9 @@ make_bold <- function(df) {
 output$schooldetails_basic <- renderTable({
   data <- selected_school_data(); req(nrow(data) > 0)
   df <- data.frame(
-    Metric = c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology"),
+    Metric = c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology", "SHA Hardship Index"),
     Value = as.character(c(
-      data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology
+      data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology, data$SHA.2021.Index
     ))
   )
   make_bold(df)
