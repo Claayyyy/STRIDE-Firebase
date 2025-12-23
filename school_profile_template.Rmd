@@ -149,7 +149,7 @@ if (!is.null(df) && nrow(df) > 0) {
   target_order <- c(
     "School ID", "School Head", "Position", "Typology",
     "Curricular Offering", "Region", "Division",
-    "Municipality", "Barangay"
+    "Municipality", "Barangay", "SHA Hardship Index"
   )
   display_df <- df %>%
     filter(Metric %in% target_order) %>%

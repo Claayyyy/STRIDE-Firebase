@@ -303,8 +303,8 @@ observeEvent(data_CR(), {
   
   cat("MAPPROXY: CL Mapping Triggered by Button\n")
   
-  values_classrooom_shortage <- paste(mainreactCR$School.Name,"<br>Total Enrolment:",mainreactCR$Enrolment.2023.2024 ,"<br>Classroom Inventory:", mainreactCR$Instructional.Rooms.2023.2024, "<br>Classroom Shortage:", mainreactCR$Est.CS) %>% lapply(htmltools::HTML)
-  values_classrooom_shortage_popup <- paste(strong("SCHOOL INFORMATION"),"<br>School Name:",mainreactCR$School.Name,"<br>School ID:",mainreactCR$SchoolID,"<br>Enrolment Size:",mainreactCR$TotalEnrolment,"<br>","<br>",strong("CLASSROOM DATA"),"<br>Estimate Classroom Shortage:", mainreactCR$Est.CS,"<br>Type of Ownership:", mainreactCR$OwnershipType,"<br>Shifting:", mainreactCR$Shifting,"<br>Electricity Source:", mainreactCR$ElectricitySource,"<br>Water Source:", mainreactCR$WaterSource) %>% lapply(htmltools::HTML)
+  values_classrooom_shortage <- paste(mainreactCR$School.Name,"<br>Total Enrolment:",mainreactCR$Enrolment.2023.2024 ,"<br>Classroom Inventory:", mainreactCR$Instructional.Rooms.2023.2024, "<br>Classroom Shortage:", mainreactCR$Classroom.Shortage) %>% lapply(htmltools::HTML)
+  values_classrooom_shortage_popup <- paste(strong("SCHOOL INFORMATION"),"<br>School Name:",mainreactCR$School.Name,"<br>School ID:",mainreactCR$SchoolID,"<br>Enrolment Size:",mainreactCR$TotalEnrolment,"<br>","<br>",strong("CLASSROOM DATA"),"<br>Estimate Classroom Shortage:", mainreactCR$Classroom.Shortage,"<br>Type of Ownership:", mainreactCR$OwnershipType,"<br>Shifting:", mainreactCR$Shifting,"<br>Electricity Source:", mainreactCR$ElectricitySource,"<br>Water Source:", mainreactCR$WaterSource) %>% lapply(htmltools::HTML)
   
   leafletProxy("CLMapping") %>%
     clearMarkers() %>%
@@ -320,7 +320,7 @@ observeEvent(data_CR(), {
       icon = awesomeIcons(
         icon = "university",
         library = "fa",
-        markerColor = case_when(suppressWarnings(as.numeric(mainreactCR$Est.CS)) > 0 ~ "red", TRUE ~ "green"),
+        markerColor = case_when(suppressWarnings(as.numeric(mainreactCR$Classroom.Shortage)) > 0 ~ "red", TRUE ~ "green"),
         iconColor = "white"
       )
     )
@@ -657,8 +657,8 @@ output$AO2Table <- DT::renderDT({
 # ----- CL Table -----
 output$CLTable <- DT::renderDT(server = FALSE, {
   datatable(data_CL_filtered() %>% 
-              select("School.Name","Enrolment.2023.2024","Instructional.Rooms.2023.2024","Est.CS","Buidable_space") %>% 
-              rename("School" = School.Name, "Total Enrolment" = Enrolment.2023.2024, "Classroom Inventory" = Instructional.Rooms.2023.2024, "Estimate Classroom Shortage" = Est.CS, "Buildable Space" = Buidable_space), 
+              select("School.Name","Enrolment.2023.2024","Instructional.Rooms.2023.2024","Classroom.Shortage","Buidable_space") %>% 
+              rename("School" = School.Name, "Total Enrolment" = Enrolment.2023.2024, "Classroom Inventory" = Instructional.Rooms.2023.2024, "Estimate Classroom Shortage" = Classroom.Shortage, "Buildable Space" = Buidable_space), 
             filter = 'top', 
             options = list(
               scrollX = TRUE,
