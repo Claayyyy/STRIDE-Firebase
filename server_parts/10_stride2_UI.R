@@ -8,7 +8,75 @@ output$STRIDE2 <- renderUI({
   is_guest <- isTRUE(isolate(authenticated_user()) == "guest_user@stride")
   
   
-  # --- 2. Define the Title/Brand UI Element ---
+  # --- 2. Define the Scripts & Styles Separately (CLEANER) ---
+  # We define this outside the navbar to keep the HTML valid
+  help_drawer_dependencies <- tags$head(
+    
+    # --- A. HELP DRAWER JAVASCRIPT ---
+    tags$script(HTML("
+      function toggleHelpDrawer() {
+        var drawer = document.getElementById('strideHelpDrawer');
+        var overlay = document.getElementById('strideHelpOverlay');
+        if (drawer.classList.contains('open')) {
+          drawer.classList.remove('open');
+          overlay.style.display = 'none';
+        } else {
+          drawer.classList.add('open');
+          overlay.style.display = 'block';
+        }
+      }
+
+      function switchTab(tabId) {
+        document.querySelectorAll('.drawer-tab-pane').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.drawer-tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).style.display = 'block';
+        event.target.classList.add('active');
+      }
+    ")),
+    
+    # --- B. APP STYLING (CSS) ---
+    tags$style(HTML("
+      /* ... (Keep all your existing CSS styles here exactly as they were) ... */
+      /* For brevity in this answer, I am not repeating the huge CSS block, */
+      /* but you should Paste the full CSS content here. */
+      
+      .navbar { position: fixed; top: 0; width: 100%; z-index: 1030; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+      body { padding-top: 100px; background-color: #f4f6f9; }
+      .navbar-nav { align-items: center; } 
+      .sticky-sidebar { position: -webkit-sticky !important; position: sticky !important; top: 0px !important; align-self: flex-start !important; height: calc(100vh - 120px) !important; max-height: calc(100vh - 120px) !important; overflow-y: auto !important; z-index: 1001 !important; }
+      .help-drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 51, 102, 0.3); backdrop-filter: blur(2px); z-index: 1040; display: none; }
+      .help-drawer { position: fixed; top: 0; right: -600px; width: 550px; height: 100vh; background: white; box-shadow: -5px 0 25px rgba(0,0,0,0.2); border-top: 8px solid #CE1126; z-index: 1050; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; display: flex; flex-direction: column; }
+      .help-drawer.open { right: 0; }
+      .drawer-header { padding: 20px 25px; background: #003366; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); opacity: 0.8; }
+      .btn-close-white:hover { opacity: 1; }
+      .drawer-tabs { padding: 0; background: #fff; border-bottom: 1px solid #eee; display: flex; justify-content: space-around; }
+      .drawer-tab-btn { border: none; background: none; padding: 15px 20px; font-weight: 600; color: #6c757d; border-bottom: 4px solid transparent; flex-grow: 1; transition: all 0.2s ease; font-size: 0.95rem; }
+      .drawer-tab-btn:hover { color: #003366; background: #f8f9fa; }
+      .drawer-tab-btn.active { color: #CE1126; border-bottom: 4px solid #CE1126; background-color: rgba(206, 17, 38, 0.03); }
+      .drawer-content { padding: 25px; flex-grow: 1; font-size: 0.95rem; background-color: #fcfcfc; }
+      .drawer-intro { background-color: #fff; border-left: 5px solid #FFB81C; padding: 15px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+      .accordion-item { border: 1px solid #e0e0e0; margin-bottom: 8px; border-radius: 6px !important; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+      .accordion-button { font-weight: 600; color: #003366; background-color: #ffffff; padding: 15px 20px; transition: all 0.2s; }
+      .accordion-button:hover { background-color: #f0f4f8; }
+      .accordion-button:not(.collapsed) { color: #ffffff; background-color: #003366; box-shadow: inset 0 -1px 0 rgba(0,0,0,.125); }
+      .accordion-button:not(.collapsed)::after { filter: brightness(0) invert(1); }
+      .accordion-body { font-size: 0.9rem; line-height: 1.6; color: #333; padding: 20px; background: #fff; }
+      .manual-section-title { color: #003366; font-weight: 700; margin-top: 20px; margin-bottom: 8px; font-size: 1rem; border-left: 4px solid #FFB81C; padding-left: 10px; }
+      .manual-ul { padding-left: 20px; margin-bottom: 15px; }
+      .manual-li { margin-bottom: 8px; }
+      .manual-img { width: 100%; border: 1px solid #ddd; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+      .faq-item, .glossary-item { background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: transform 0.2s; }
+      .faq-item:hover, .glossary-item:hover { transform: translateX(5px); border-left: 3px solid #CE1126; }
+      .glossary-term { font-weight: 700; color: #003366; display: block; font-size: 1rem; margin-bottom: 5px;}
+      .faq-q { font-weight: 700; color: #003366; display: block; margin-bottom: 8px; }
+      .faq-a { color: #444; margin-bottom: 0; font-size: 0.9rem; }
+      .js-plotly-plot .plotly .modebar { top: -30px !important; }
+      @media (max-width: 600px) { .help-drawer { width: 100%; right: -100%; } }
+    "))
+  )
+  
+  # --- 3. Define the Title/Brand UI Element (VISUALS ONLY) ---
   navbar_title_ui <- tags$a(
     class = "navbar-brand d-flex align-items-center me-auto",
     href = "#",
@@ -31,203 +99,9 @@ output$STRIDE2 <- renderUI({
         "Strategic Inventory for Deployment Efficiency", 
         style = "font-size: 17px; color: #3d3232; display: block; line-height: 1; margin-top: -21px;"
       )
-    ),
-    
-    # 3. Head Elements (JS & CSS)
-    tags$head(
-      
-      # --- A. HELP DRAWER JAVASCRIPT ---
-      tags$script(HTML("
-      function toggleHelpDrawer() {
-        var drawer = document.getElementById('strideHelpDrawer');
-        var overlay = document.getElementById('strideHelpOverlay');
-        if (drawer.classList.contains('open')) {
-          drawer.classList.remove('open');
-          overlay.style.display = 'none';
-        } else {
-          drawer.classList.add('open');
-          overlay.style.display = 'block';
-        }
-      }
-
-      function switchTab(tabId) {
-        document.querySelectorAll('.drawer-tab-pane').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.drawer-tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).style.display = 'block';
-        event.target.classList.add('active');
-      }
-    ")),
-      
-      # --- B. APP STYLING (CSS) ---
-      tags$style(HTML("
-      /* --- NAVBAR & BODY --- */
-      .navbar {
-        position: fixed; 
-        top: 0;          
-        width: 100%;     
-        z-index: 1030;   
-        background: white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-      
-      body {
-        padding-top: 100px; 
-        background-color: #f4f6f9;
-      }
-      
-      .navbar-nav { align-items: center; } 
-
-      /* --- STICKY SIDEBAR --- */
-      .sticky-sidebar {
-        position: -webkit-sticky !important;
-        position: sticky !important;
-        top: 0px !important; 
-        align-self: flex-start !important;
-        height: calc(100vh - 120px) !important;
-        max-height: calc(100vh - 120px) !important;
-        overflow-y: auto !important;
-        z-index: 1001 !important;
-      }
-
-      /* --- HELP DRAWER CONTAINER --- */
-      .help-drawer-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 51, 102, 0.3);
-        backdrop-filter: blur(2px);
-        z-index: 1040; display: none;
-      }
-      
-      .help-drawer {
-        position: fixed; top: 0; right: -600px;
-        width: 550px; height: 100vh;
-        background: white; 
-        box-shadow: -5px 0 25px rgba(0,0,0,0.2);
-        border-top: 8px solid #CE1126; /* DepEd Red */
-        z-index: 1050; 
-        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: auto; display: flex; flex-direction: column;
-      }
-      
-      .help-drawer.open { right: 0; }
-
-      /* --- DRAWER HEADER --- */
-      .drawer-header { 
-        padding: 20px 25px; 
-        background: #003366; /* DepEd Blue */
-        color: white;
-        display: flex; justify-content: space-between; align-items: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      
-      .btn-close-white {
-        filter: invert(1) grayscale(100%) brightness(200%);
-        opacity: 0.8;
-      }
-      .btn-close-white:hover { opacity: 1; }
-
-      /* --- DRAWER TABS --- */
-      .drawer-tabs {
-        padding: 0; background: #fff; border-bottom: 1px solid #eee;
-        display: flex; justify-content: space-around;
-      }
-      
-      .drawer-tab-btn { 
-        border: none; background: none; padding: 15px 20px; 
-        font-weight: 600; color: #6c757d; 
-        border-bottom: 4px solid transparent;
-        flex-grow: 1; transition: all 0.2s ease;
-        font-size: 0.95rem;
-      }
-      
-      .drawer-tab-btn:hover { color: #003366; background: #f8f9fa; }
-      
-      .drawer-tab-btn.active { 
-        color: #CE1126; 
-        border-bottom: 4px solid #CE1126; 
-        background-color: rgba(206, 17, 38, 0.03);
-      }
-
-      /* --- DRAWER CONTENT --- */
-      .drawer-content { 
-        padding: 25px; flex-grow: 1; 
-        font-size: 0.95rem; background-color: #fcfcfc; 
-      }
-      
-      .drawer-intro {
-        background-color: #fff; 
-        border-left: 5px solid #FFB81C; /* Gold Accent */
-        padding: 15px; margin-bottom: 20px; border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      }
-
-      /* --- ACCORDION (DEPED THEME) --- */
-      .accordion-item { 
-        border: 1px solid #e0e0e0; margin-bottom: 8px; 
-        border-radius: 6px !important; overflow: hidden; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-      }
-      
-      .accordion-button { 
-        font-weight: 600; color: #003366; background-color: #ffffff; 
-        padding: 15px 20px; transition: all 0.2s;
-      }
-      
-      .accordion-button:hover { background-color: #f0f4f8; }
-      
-      .accordion-button:not(.collapsed) { 
-        color: #ffffff; 
-        background-color: #003366; 
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,.125); 
-      }
-      
-      .accordion-button:not(.collapsed)::after {
-        filter: brightness(0) invert(1);
-      }
-      
-      .accordion-body { 
-        font-size: 0.9rem; line-height: 1.6; color: #333; 
-        padding: 20px; background: #fff;
-      }
-
-      /* --- MANUAL & FAQ ITEMS --- */
-      .manual-section-title { 
-        color: #003366; font-weight: 700; 
-        margin-top: 20px; margin-bottom: 8px; 
-        font-size: 1rem; border-left: 4px solid #FFB81C; 
-        padding-left: 10px; 
-      }
-      .manual-ul { padding-left: 20px; margin-bottom: 15px; }
-      .manual-li { margin-bottom: 8px; }
-      .manual-img { 
-        width: 100%; border: 1px solid #ddd; border-radius: 8px; 
-        margin: 15px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
-      }
-      
-      .faq-item, .glossary-item { 
-        background: white; padding: 15px; 
-        border-radius: 8px; border: 1px solid #eee; 
-        margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        transition: transform 0.2s;
-      }
-      .faq-item:hover, .glossary-item:hover {
-        transform: translateX(5px); border-left: 3px solid #CE1126;
-      }
-      
-      .glossary-term { font-weight: 700; color: #003366; display: block; font-size: 1rem; margin-bottom: 5px;}
-      .faq-q { font-weight: 700; color: #003366; display: block; margin-bottom: 8px; }
-      .faq-a { color: #444; margin-bottom: 0; font-size: 0.9rem; }
-
-      /* --- UTILITIES --- */
-      .js-plotly-plot .plotly .modebar {
-         top: -30px !important;
-      }
-
-      @media (max-width: 600px) {
-        .help-drawer { width: 100%; right: -100%; }
-      }
-    "))
     )
-  ) # End navbar_title_ui
+    # NOTE: I REMOVED tags$head FROM HERE
+  )
   
   
   # --- 3. Define the list of nav items ALL users can see ---
@@ -1655,7 +1529,7 @@ output$STRIDE2 <- renderUI({
             pickerInput("NTP_Data_Toggles", strong("Non-teaching Data Toggles"), choices = c("COS" = "Outlier.Status", "AOII Clustering Status" = "Clustering.Status"), multiple = TRUE, options = pickerOptions(`actions-box` = TRUE, dropupAuto = FALSE, dropup = FALSE)),
             pickerInput("Enrolment_Data_Toggles", strong("Enrolment Data Toggles"), choices = c("Total Enrolment" = "TotalEnrolment", "Kinder" = "Kinder", "Grade 1" = "G1", "Grade 2" = "G2", "Grade 3" = "G3", "Grade 4" = "G4", "Grade 5" = "G5", "Grade 6" = "G6", "Grade 7" = "G7", "Grade 8" = "G8", "Grade 9" = "G9", "Grade 10" = "G10", "Grade 11" = "G11", "Grade 12" = "G12"), multiple = TRUE, options = pickerOptions(`actions-box` = TRUE, dropupAuto = FALSE, dropup = FALSE)),
             pickerInput("Specialization_Data_Toggles", strong("Specialization Data Toggles"), choices = c("English" = "English", "Mathematics" = "Mathematics", "Science" = "Science", "Biological Sciences" = "Biological.Sciences", "Physical Sciences" = "Physical.Sciences"), multiple = TRUE, options = pickerOptions(`actions-box` = TRUE, dropupAuto = FALSE, dropup = FALSE)),
-            pickerInput("Infrastructure_Data_Toggles", strong("Infrastructure Data Toggles"), choices = c("Classroom Shortage" = "Classroom.Shortage", "Buildable Space" = "With_Buildable_space", "Last Mile Schools" = "LMS.School"), multiple = TRUE, options = pickerOptions(`actions-box` = TRUE, dropupAuto = FALSE, dropup = FALSE))
+            pickerInput("Infrastructure_Data_Toggles", strong("Infrastructure Data Toggles"), choices = c("Classrooms" = "Instructional.Rooms.2023.2024", "Classroom Requirement" =  "Classroom.Requirement","Classroom Shortage" = "Classroom.Shortage", "Buildings" = "Buildings", "Buildable Space" = "With_Buildable_space","Major Repairs Needed" = "Major.Repair.2023.2024", "Last Mile Schools" = "LMS.School","Seats Inventory" = "Total.Total.Seat", "Seats Shortage" = "Total.Seats.Shortage","Ownership Type" = "OwnershipType", "Electricity Source" = "ElectricitySource", "Water Source" = "WaterSource"), multiple = TRUE, options = pickerOptions(`actions-box` = TRUE, dropupAuto = FALSE, dropup = FALSE))
           ), # End sidebar
           layout_columns(
             card(card_header(strong("HROD Data Panel")), dataTableOutput("HROD_Table")),
@@ -1753,6 +1627,7 @@ output$STRIDE2 <- renderUI({
   
   # --- 7. Return Navbar wrapped with Drawer HTML ---
   tagList(
+    help_drawer_dependencies,
     navbar_ui,
     
     # --- DRAWER OVERLAY ---
