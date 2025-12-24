@@ -127,7 +127,7 @@ for (i in seq_along(params$metrics)) {
     description_text <- paste0(
       "The chart above illustrates the distribution for ", tags$b(clean_name), ". ",
       "The data indicates that ", tags$b(top_cat$Category), " holds the highest share with ", 
-      format(top_cat$Value, big.mark=","), " instances. ",
+      format(top_cat$Value, big.mark=","),
       "Conversely, ", tags$b(bottom_cat$Category), " represents the lowest value in this dataset with ", 
       format(bottom_cat$Value, big.mark=","), ". ",
       "The total recorded count across all displayed categories is ", format(total_val, big.mark=","), "."

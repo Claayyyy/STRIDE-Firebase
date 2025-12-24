@@ -455,9 +455,9 @@ make_bold <- function(df) {
 output$qs_basic <- renderTable({
   data <- qs_data(); req(nrow(data) > 0)
   df <- data.frame(
-    Metric = c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology", "SHA Hardship Index"),
+    Metric = c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology", "SHA Hardship Index", "Last Mile School"),
     Value = as.character(c(
-      data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology, data$SHA.2021.Index
+      data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology, data$SHA.2021.Index, ifelse(data$LMS.School == 1, "Yes", "No")
     ))
   )
   make_bold(df)
@@ -671,8 +671,8 @@ output$download_school_profile <- downloadHandler(
       }
       
       df_basic <- create_filtered_table(
-        c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology", "Region", "Division", "District", "Municipality", "Barangay", "SHA Hardship Index"),
-        c(data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology, data$Region, data$Division, data$District, data$Municipality, data$Barangay, data$SHA.2021.Index)
+        c("School Name", "School ID", "School Head", "Position", "Curricular Offering", "Typology", "Region", "Division", "District", "Municipality", "Barangay", "SHA Hardship Index", "Last Mile School"),
+        c(data$School.Name, data$SchoolID, data$School.Head.Name, data$SH.Position, data$Modified.COC, data$School.Size.Typology, data$Region, data$Division, data$District, data$Municipality, data$Barangay, data$SHA.2021.Index,ifelse(data$LMS.School == 1, "Yes", "No"))
       )
       
       df_enrol <- create_filtered_table(
