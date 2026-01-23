@@ -17,9 +17,19 @@ output$STRIDE2 <- renderUI({
       function toggleHelpDrawer() {
         var drawer = document.getElementById('strideHelpDrawer');
         var overlay = document.getElementById('strideHelpOverlay');
+        var videoFrame = document.getElementById('tutorialVideoFrame');
+
         if (drawer.classList.contains('open')) {
           drawer.classList.remove('open');
           overlay.style.display = 'none';
+          
+          // Stop video playback by resetting src
+          if (videoFrame) {
+            var currentSrc = videoFrame.src;
+            videoFrame.src = '';
+            videoFrame.src = currentSrc;
+          }
+
         } else {
           drawer.classList.add('open');
           overlay.style.display = 'block';
@@ -97,7 +107,7 @@ output$STRIDE2 <- renderUI({
       ),
       tags$small(
         "Strategic Inventory for Deployment Efficiency", 
-        style = "font-size: 17px; color: #3d3232; display: block; line-height: 1; margin-top: -21px;"
+        style = "font-size: 17px; color: #3d3232; display: block; line-height: 1; margin-top: -12px;"
       )
     )
     # NOTE: I REMOVED tags$head FROM HERE
@@ -1650,7 +1660,8 @@ output$STRIDE2 <- renderUI({
       
       # --- 2. TABS (Updated with "STRIDER") ---
       tags$div(class = "drawer-tabs",
-               tags$button(class = "drawer-tab-btn active", onclick = "switchTab('tab-guide', this)", "Manual"),
+               tags$button(class = "drawer-tab-btn active", onclick = "switchTab('tab-tutorial', this)", "Video Guide"),
+               tags$button(class = "drawer-tab-btn", onclick = "switchTab('tab-guide', this)", "Manual"),
                tags$button(class = "drawer-tab-btn", onclick = "switchTab('tab-glossary', this)", "Glossary"),
                tags$button(class = "drawer-tab-btn", onclick = "switchTab('tab-faq', this)", "FAQs"),
                # tags$button(class = "drawer-tab-btn", onclick = "switchTab('tab-chat', this)", style="color: #FFC107; font-weight: bold;", icon("robot"), " STRIDER")
@@ -1718,9 +1729,23 @@ output$STRIDE2 <- renderUI({
       tags$div(class = "drawer-content",
                
                # ==========================
+               # TAB 0: TUTORIAL (New)
+               # ==========================
+               tags$div(id = "tab-tutorial", class = "drawer-tab-pane", style = "display: block;",
+                        tags$h5("Video Walkthrough", style="color:#003366; margin-top:0; font-weight:bold; margin-bottom: 15px;"),
+                        tags$div(style = "position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);",
+                                 tags$iframe(id = "tutorialVideoFrame",
+                                             src = "https://www.youtube.com/embed/TirKDX1Wwz4", 
+                                             style = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;", 
+                                             allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture", 
+                                             allowfullscreen = NA)
+                        )
+               ),
+               
+               # ==========================
                # TAB 1: MANUAL (Your Code)
                # ==========================
-               tags$div(id = "tab-guide", class = "drawer-tab-pane", style = "display: block;",
+               tags$div(id = "tab-guide", class = "drawer-tab-pane", style = "display: none;",
                         
                         tags$div(class = "drawer-intro",
                                  tags$h5("1. Introduction", style="color:#003366; margin-top:0; font-weight:bold;"),

@@ -512,7 +512,7 @@ output$school_table <- DT::renderDataTable({
     rownames = FALSE,
     extensions = 'FixedColumns', # --- NEW: Add the FixedColumns extension ---
     options = list(
-      pageLength = 10,
+      pageLength = 20,
       scrollY = "400px", 
       scrollCollapse = TRUE,
       paging = TRUE,
