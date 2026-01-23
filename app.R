@@ -48,9 +48,9 @@ uni45k <- read_parquet("School-Unique-v2.parquet") %>%
 uni <- left_join(uni48k, uni45k, by = "SchoolID") %>% 
   mutate(
     Buildable_Space = case_when(
-      tolower(trimws(With_Buildable_space)) == "yes" ~ 1,
-      tolower(trimws(With_Buildable_space)) == "no" ~ 0,
-      TRUE ~ NA_real_
+      tolower(trimws(With_Buildable_space)) == "yes" ~ "Yes",
+      tolower(trimws(With_Buildable_space)) == "no" ~ "No",
+      TRUE ~ NA_character_
     )
   ) %>%
   select(
@@ -61,8 +61,8 @@ uni <- left_join(uni48k, uni45k, by = "SchoolID") %>%
 # --- ADVANCED ANALYTICS SETUP ---
 print("--- ADVANCED ANALYTICS: Starting column analysis... ---")
 analytics_column_map <- tibble(
-  Raw_Name = c("Implementing.Unit", "Modified.COC", "TotalEnrolment", "SH.Position", "School.Size.Typology", "Shifting", "OwnershipType", "ElectricitySource", "WaterSource", "Total.Excess", "Total.Shortage", "TotalTeachers", "Classroom.Shortage", "With_Buildable_space"),
-  Clean_Name = c("Implementing Unit", "Curricular Offering", "Total Enrolment", "School Head Position", "School Size", "Shifting", "Ownership Type", "Electricity Source", "Water Source", "Teacher Excess", "Teacher Shortage", "Total Teachers", "Classroom Shortage", "Buildable Space")
+  Raw_Name = c("Implementing.Unit", "Modified.COC", "TotalEnrolment", "School.Size.Typology", "Shifting", "OwnershipType", "ElectricitySource", "WaterSource", "Total.Excess", "Total.Shortage", "TotalTeachers", "Classroom.Shortage", "Buildable_Space"),
+  Clean_Name = c("Implementing Unit", "Curricular Offering", "Total Enrolment", "School Size", "Shifting", "Ownership Type", "Electricity Source", "Water Source", "Teacher Excess", "Teacher Shortage", "Total Teachers", "Classroom Shortage", "Buildable Space")
 )
 get_col_type_adv <- function(column) {
   num_unique <- n_distinct(column)

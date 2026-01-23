@@ -210,6 +210,9 @@ observe({
 # This val will ONLY be updated when input$TextRun is clicked.
 data_snapshot <- reactiveVal(NULL)
 
+# 4a.2. Store selected school data (from either Table or Map)
+selected_school_store <- reactiveVal(NULL)
+
 # 4b. This observeEvent now does the filtering and PUSHES
 #    the result into our data_snapshot()
 observeEvent(input$TextRun, {
@@ -264,6 +267,7 @@ observeEvent(input$TextRun, {
   # --- THIS IS THE KEY ---
   # Save the final data to our "snapshot"
   data_snapshot(final_data)
+  selected_school_store(NULL) # Clear selection on new search
   
 }, ignoreNULL = TRUE, ignoreInit = TRUE) # This should listen to the button click
 
@@ -320,6 +324,7 @@ observe({
     addAwesomeMarkers(
       lng = data$Longitude,
       lat = data$Latitude,
+      layerId = data$SchoolID, # --- Added layerId for click events ---
       icon = makeAwesomeIcon(
         icon = "education",
         library = "glyphicon",
@@ -392,56 +397,55 @@ output$TextTable <- DT::renderDT(server = TRUE, {
 # This defines 'qs_data()' which your detail tables below are waiting for.
 # --- A. Reactive for Detail Tables (Data Source) ---
 # This serves the detail tables (schooldetails_basic, etc.)
+# --- 6. Handle Selection (Table OR Map) ---
+
+# --- A. Reactive Source for Detail Tables ---
+# Now reads from the centralized store
 qs_data <- reactive({
-  
-  selected_row_index <- input$TextTable_rows_selected
-  req(selected_row_index)
-  
-  # Get the data that was used to render the table
-  table_data <- data_snapshot()
-  req(nrow(table_data) > 0)
-  
-  # Return the specific row data
-  return(table_data[selected_row_index, , drop = FALSE])
+  req(selected_school_store())
+  selected_school_store()
 })
 
-# B. Observe the Selection to Zoom the Map
-# --- B. Observe the Selection to Zoom the Map ---
-# --- B. Map Zoom Logic (Based on your working code) ---
+# --- B.1 Update Store from Table Selection ---
 observeEvent(input$TextTable_rows_selected, {
+  idx <- input$TextTable_rows_selected
+  req(idx)
   
-  selected_row_index <- input$TextTable_rows_selected
-  req(selected_row_index)
+  data <- data_snapshot()
+  req(nrow(data) >= idx)
   
-  # Get the data that was used to render the table (your current source)
-  table_data <- data_snapshot()
+  row_data <- data[idx, , drop = FALSE]
+  selected_school_store(row_data) # Update store
   
-  # Robustness Check 1: Data exists
-  req(nrow(table_data) >= selected_row_index)
+  # Zoom Logic
+  current_lat <- as.numeric(row_data$Latitude)
+  current_lng <- as.numeric(row_data$Longitude)
   
-  selected_row_data <- table_data[selected_row_index, ]
-  
-  # --- Data Type Conversion (Crucial Step) ---
-  current_lat <- as.numeric(selected_row_data$Latitude)
-  current_lng <- as.numeric(selected_row_data$Longitude)
-  
-  # Robustness Check 2: Coordinates are valid
-  if (is.na(current_lng) || is.na(current_lat)) {
-    # If using shinyjs, you can show a notification
-    # showNotification("Selected school has no map coordinates.", type = "warning")
-    return() 
+  if (!is.na(current_lat) && !is.na(current_lng)) {
+    leafletProxy("TextMapping") %>%
+      flyTo(lng = current_lng, lat = current_lat, zoom = 15)
   }
+})
+
+# --- B.2 Update Store from Map Click (NEW) ---
+# --- B.2 Update Store from Map Click (UPDATED) ---
+observeEvent(input$TextMapping_marker_click, {
+  click <- input$TextMapping_marker_click
+  req(click$id) # This is the SchoolID from layerId
   
-  # --- *** The Working Leaflet Command *** ---
-  leafletProxy("TextMapping") %>% # Changed from "school_map"
-    flyTo(
-      lng = current_lng,
-      lat = current_lat,
-      zoom = 15, # Zoom level 15 is a good close-up
-      options = leafletOptions(duration = 1)
-    )
+  data <- data_snapshot()
+  req(data)
   
-}, ignoreNULL = TRUE, ignoreInit = TRUE)
+  # Find index in the snapshot
+  # We use which() to find the row index matching the SchoolID
+  idx <- which(data$SchoolID == click$id)
+  
+  if (length(idx) > 0) {
+    # Select the row in DT
+    # This triggers input$TextTable_rows_selected, which handles Store Update & Zoom
+    DT::dataTableProxy("TextTable") %>% selectRows(idx[1])
+  }
+})
 
 # --- 3. RENDER THE GRANULAR DETAIL TABLES (NO HEADERS) ---
 
