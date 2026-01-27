@@ -458,7 +458,14 @@ observeEvent(data_NTP(), {
         markerColor = case_when(mainreactNTP$Congestion.Index >= 0 & mainreactNTP$Congestion.Index < 0.25 ~ "green", 
                                 mainreactNTP$Congestion.Index >= 0.25 & mainreactNTP$Congestion.Index < 0.5 ~ "green", 
                                 mainreactNTP$Congestion.Index >= 0.5 & mainreactNTP$Congestion.Index < 0.75 ~ "orange",
-                                mainreactNTP$Congestion.Index >= 0.75 ~ "red")))
+                                mainreactNTP$Congestion.Index >= 0.75 ~ "red"))) %>% 
+    addLegend(
+      position = "bottomright", 
+      colors = c("green", "orange", "red"),
+      labels = c("Not Congested", "Moderately Congested", "Severely Congested"),
+      title = "Legend",
+      opacity = 1
+    )
 })
 
 # --- 3. MAP-BOUNDS FILTERED REACTIVES ---
