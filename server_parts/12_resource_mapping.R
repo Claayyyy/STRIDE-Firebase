@@ -675,7 +675,7 @@ observeEvent(input$Teaching_Deployment_Refresh, {
   DistRCT1 <- input$Resource_LegDist
   Lev <- input$resource_map_level
   
-  mainreact1 <- df %>% filter(Region == RegRCT) %>% filter(Division == SDORCT1) %>% filter(Legislative.District == DistRCT1) %>% filter(Level == Lev)
+  mainreact1 <- df %>% filter(Region == RegRCT) %>% filter(Division == SDORCT1) %>% filter(Legislative.District %in% DistRCT1) %>% filter(Level == Lev)
   
   NetShortage <- df %>% select(Region,Division,Level,TeacherShortage,TeacherExcess) %>%
     pivot_longer(cols = c(TeacherShortage, TeacherExcess), names_to = "Inventory", values_to = "Count") %>% mutate(Count=as.numeric(Count)) %>% na.omit(Count) %>% group_by(Region, Division,Level, Inventory) %>% summarize(Count = sum(Count)) %>% pivot_wider(names_from = "Inventory", values_from = "Count") %>% mutate(NetShortage=TeacherShortage-TeacherExcess) %>% mutate(NetShortage = ifelse(NetShortage < 0, 0, NetShortage))

@@ -711,7 +711,7 @@ output$STRIDE2 <- renderUI({
             layout_columns( 
               col_widths = c(12,12,12,12),
               navset_card_tab(
-                  id = "infra_tabs",
+                id = "infra_tabs",
                 nav_panel("Allocation Overview", layout_columns(card(full_screen = TRUE, plotlyOutput("allocationStackedBar", height = "100%"), fill = TRUE, fillable = TRUE, max_height = "auto", height = 500))),
                 nav_panel("Completion Overview", card(full_screen = TRUE, plotlyOutput("completionByCategoryPlot", height = "100%"), fill = TRUE, fillable = TRUE, max_height = "auto", height = 500))
               ),
@@ -751,7 +751,7 @@ output$STRIDE2 <- renderUI({
             pickerInput(inputId = "qss_division", label = "Filter by Division:", choices = sort(unique(uni$Division)), selected = NULL, multiple = FALSE, options = pickerOptions(actionsBox = TRUE, liveSearch = TRUE, title = "All Divisions")),
             pickerInput(inputId = "qss_legdist", label = "Filter by Legislative District:", choices = sort(unique(uni$Legislative.District)), selected = NULL, multiple = FALSE, options = pickerOptions(actionsBox = TRUE, liveSearch = TRUE, title = "All Districts")),
             pickerInput(inputId = "qss_municipality", label = "Filter by Municipality:", choices = sort(unique(uni$Municipality)), selected = NULL, multiple = FALSE, options = pickerOptions(actionsBox = TRUE, liveSearch = TRUE, title = "All Municipalities")),
-          actionButton("clear_qss_filters", "Clear Filters", icon = icon("eraser"), class = "btn-outline-danger", style = "width: 100%; margin-top: 5px; margin-bottom: 5px;")),
+            actionButton("clear_qss_filters", "Clear Filters", icon = icon("eraser"), class = "btn-outline-danger", style = "width: 100%; margin-top: 5px; margin-bottom: 5px;")),
           input_task_button("TextRun", icon_busy = fontawesome::fa_i("refresh", class = "fa-spin", "aria-hidden" = "true"), strong("Show Selection"), class = "btn-warning")
         ), 
         tags$script(HTML("
@@ -787,9 +787,9 @@ output$STRIDE2 <- renderUI({
             tagList(
               layout_columns(
                 col_widths = c(6,6),
-              # Row 1: Basic Info
-              card(card_header(strong("Basic Information")), tableOutput("qs_basic")),
-              card(card_header(strong("Location")), tableOutput("qs_location"))),
+                # Row 1: Basic Info
+                card(card_header(strong("Basic Information")), tableOutput("qs_basic")),
+                card(card_header(strong("Location")), tableOutput("qs_location"))),
               
               
               # Row 2: Enrolment & Teachers
@@ -827,653 +827,703 @@ output$STRIDE2 <- renderUI({
       value = "resource_mapping_tab",
       icon = bs_icon("map"),
       
-      layout_sidebar(
-        sidebar = sidebar(
-          class = "sticky-sidebar",
-          width = 375,
-          title = "Resource Mapping Filters",
-          
-          # --- 1. SHARED LOCATION FILTERS ---
-          card(
-            height = "auto",
-            card_header(tags$b("Data Filters")),
-            pickerInput(
-              inputId = "resource_map_region", 
-              label = "Region:", 
-              choices = c("Region I", "Region II", "Region III", "Region IV-A", "MIMAROPA", 
-                          "Region V", "Region VI", "NIR", "Region VII", "Region VIII", 
-                          "Region IX", "Region X", "Region XI", "Region XII", "CARAGA", 
-                          "CAR", "NCR"), 
-              selected = "Region I", 
-              options = list(`actions-box` = FALSE, `none-selected-text` = "Select a region")
-            ),
-            pickerInput(
-              inputId = "Resource_SDO", 
-              label = "Select a Division:", 
-              choices = NULL, 
-              selected = NULL, 
-              options = list(`actions-box` = FALSE, `none-selected-text` = "Select a division")
-            ),
-            pickerInput(
-              inputId = "Resource_LegDist", 
-              label = "Select Legislative District(s):", 
-              choices = NULL, 
-              selected = NULL, 
-              multiple = TRUE, 
-              options = list(`actions-box` = TRUE, `none-selected-text` = "Select districts")
-            ),
-            
-            # --- CONDITIONAL INPUTS (DEPENDING ON ACTIVE TAB) ---
-            
-            # Show Level only for Teaching Deployment Tab
-            conditionalPanel(
-              condition = "input.resource_main_tab == 'Teaching Deployment'",
-              pickerInput(
-                inputId = "resource_map_level",
-                label = "Select Level:",
-                choices = c("ES", "JHS", "SHS"), # Ensure these match your df$Level values
-                selected = "ES",
-                options = list(`actions-box` = FALSE)
-              )
-            ),
-            
-            # Show Facility Type only for Facilities Tab
-            # (Restored this input as it is required by data_EFD in server)
-            conditionalPanel(
-              condition = "input.resource_main_tab == 'Facilities'",
-              pickerInput(
-                inputId = "EFD_Type",
-                label = "Select Facility Category:",
-                choices = c("New Construction","Electrification","Health","QRF","LMS","ALS-CLC","Gabaldon", "Repairs"), # Add specific choices as needed
-                multiple = TRUE,
-                selected = c("New Construction","Electrification"),
-                options = list(`actions-box` = TRUE, `live-search` = TRUE)
-              )
-            ),
-            
-            hr(),
-            # Action Button
-            input_task_button("Mapping_Run", strong("Generate Map & Data"), class = "btn-warning w-100")
-          )
-        ), 
-        
-        # --- 2. MAIN CONTENT TABS ---
-        bslib::navset_card_tab(
-          id = "resource_main_tab", # ID used for sidebar conditional logic
-          
-          # ----- TAB 1: TEACHING DEPLOYMENT -----
-          nav_panel(
-            title = "Teaching Deployment",
-            value = "Teaching Deployment",
-            
-            
-            tagList(
-              h3("Teaching Deployment Overview"),
-
-              # 
-              # layout_columns(
-              #   selectInput("resource_map_level", "Filter Curricular Level:",
-              #               choices = c("Elementary School"="ES",
-              #                           "Junior High School"="JHS",
-              #                           "Senior High School"="SHS"),
-              #               selected = "ES"),
-              #   input_task_button("Teaching_Deployment_Refresh", strong("Refresh"), class = "btn-warning"),
-              #   col_widths = c(4, -8, 2)
-              # ),
-              # 
-              # hr(),
+      bslib::navset_card_tab(
+        nav_panel(
+          title = "Standard View",
+          layout_sidebar(
+            sidebar = sidebar(
+              class = "sticky-sidebar",
+              width = 375,
+              title = "Resource Mapping Filters",
               
-              # --- Accordion only for summary cards ---
-              accordion(
-                open = "Deployment Summary by Level",
+              # --- 1. SHARED LOCATION FILTERS ---
+              card(
+                height = "auto",
+                card_header(tags$b("Data Filters")),
+                pickerInput(
+                  inputId = "resource_map_region", 
+                  label = "Region:", 
+                  choices = c("Region I", "Region II", "Region III", "Region IV-A", "MIMAROPA", 
+                              "Region V", "Region VI", "NIR", "Region VII", "Region VIII", 
+                              "Region IX", "Region X", "Region XI", "Region XII", "CARAGA", 
+                              "CAR", "NCR"), 
+                  selected = "Region I", 
+                  options = list(`actions-box` = FALSE, `none-selected-text` = "Select a region")
+                ),
+                pickerInput(
+                  inputId = "Resource_SDO", 
+                  label = "Select a Division:", 
+                  choices = NULL, 
+                  selected = NULL, 
+                  options = list(`actions-box` = FALSE, `none-selected-text` = "Select a division")
+                ),
+                pickerInput(
+                  inputId = "Resource_LegDist", 
+                  label = "Select Legislative District(s):", 
+                  choices = NULL, 
+                  selected = NULL, 
+                  multiple = TRUE, 
+                  options = list(`actions-box` = TRUE, `none-selected-text` = "Select districts")
+                ),
                 
-                accordion_panel(
-                  title = "Deployment Summary by Level",
-                  icon = bsicons::bs_icon("bar-chart-fill"),
+                # --- CONDITIONAL INPUTS (DEPENDING ON ACTIVE TAB) ---
+                
+                # Show Level only for Teaching Deployment Tab
+                conditionalPanel(
+                  condition = "input.resource_main_tab == 'Teaching Deployment'",
+                  pickerInput(
+                    inputId = "resource_map_level",
+                    label = "Select Level:",
+                    choices = c("ES", "JHS", "SHS"), # Ensure these match your df$Level values
+                    selected = "ES",
+                    options = list(`actions-box` = FALSE)
+                  )
+                ),
+                
+                # Show Facility Type only for Facilities Tab
+                # (Restored this input as it is required by data_EFD in server)
+                conditionalPanel(
+                  condition = "input.resource_main_tab == 'Facilities'",
+                  pickerInput(
+                    inputId = "EFD_Type",
+                    label = "Select Facility Category:",
+                    choices = c("New Construction","Electrification","Health","QRF","LMS","ALS-CLC","Gabaldon", "Repairs"), # Add specific choices as needed
+                    multiple = TRUE,
+                    selected = c("New Construction","Electrification"),
+                    options = list(`actions-box` = TRUE, `live-search` = TRUE)
+                  )
+                ),
+                
+                hr(),
+                # Action Button
+                input_task_button("Mapping_Run", strong("Generate Map & Data"), class = "btn-warning w-100")
+              )
+            ), 
+            
+            # --- 2. MAIN CONTENT TABS ---
+            bslib::navset_card_tab(
+              id = "resource_main_tab", # ID used for sidebar conditional logic
+              
+              # ----- TAB 1: TEACHING DEPLOYMENT -----
+              nav_panel(
+                title = "Teaching Deployment",
+                value = "Teaching Deployment",
+                
+                
+                tagList(
+                  h3("Teaching Deployment Overview"),
                   
-                  # --- Start of Tabset (now ABOVE the summary cards) ---
-                  navset_tab(
-                    # Note: All panels are commented out, so this tabset will be empty.
-                    # nav_panel("Regional Breakdown",
-                    #           plotlyOutput("Teaching_Deployment_Region_Graph")
-                    # ),
-                    # nav_panel("Priority Divisions",
-                    #           plotlyOutput("Teaching_Deployment_Division_Graph1")
-                    # ),
-                    # nav_panel("Dataset",
-                    #           dataTableOutput("Teaching_Deployment_Dataset")
-                    # )
-                  ),
-                  # --- End of Tabset ---
+                  # 
+                  # layout_columns(
+                  #   selectInput("resource_map_level", "Filter Curricular Level:",
+                  #               choices = c("Elementary School"="ES",
+                  #                           "Junior High School"="JHS",
+                  #                           "Senior High School"="SHS"),
+                  #               selected = "ES"),
+                  #   input_task_button("Teaching_Deployment_Refresh", strong("Refresh"), class = "btn-warning"),
+                  #   col_widths = c(4, -8, 2)
+                  # ),
+                  # 
+                  # hr(),
                   
-
+                  # --- Accordion only for summary cards ---
+                  accordion(
+                    open = "Deployment Summary by Level",
+                    
+                    accordion_panel(
+                      title = "Deployment Summary by Level",
+                      icon = bsicons::bs_icon("bar-chart-fill"),
+                      
+                      # --- Start of Tabset (now ABOVE the summary cards) ---
+                      navset_tab(
+                        # Note: All panels are commented out, so this tabset will be empty.
+                        # nav_panel("Regional Breakdown",
+                        #           plotlyOutput("Teaching_Deployment_Region_Graph")
+                        # ),
+                        # nav_panel("Priority Divisions",
+                        #           plotlyOutput("Teaching_Deployment_Division_Graph1")
+                        # ),
+                        # nav_panel("Dataset",
+                        #           dataTableOutput("Teaching_Deployment_Dataset")
+                        # )
+                      ),
+                      # --- End of Tabset ---
+                      
+                      
+                      
+                      # --- Summary Cards ---
+                      layout_column_wrap(
+                        width = 1/4,
+                        card(
+                          card_header(strong("RO Filling-up Rate")),
+                          valueBoxOutput("f")
+                        ),
+                        card(
+                          card_header(strong("RO Unfilled Items")),
+                          valueBoxOutput("g")
+                        ),
+                        card(
+                          card_header(strong("SDO Filling-up Rate")),
+                          valueBoxOutput("a")
+                        ),
+                        card(
+                          card_header(strong("SDO Unfilled Items")),
+                          valueBoxOutput("b")
+                        )
+                        # card(
+                        #   card_header(strong("SDO Net Shortage")),
+                        #   valueBoxOutput("e")
+                        # )
+                      ),
+                      
+                      
+                      layout_columns(
+                        card(
+                          card_header(strong("Teacher Excess and Shortage")),
+                          dataTableOutput("TeacherShortage_Table")
+                        ),
+                        card(
+                          full_screen = TRUE,
+                          card_header(strong("Personnel Deployment Mapping")),
+                          leafletOutput("TeacherShortage_Mapping", height = 700)
+                        ),
+                        # card(
+                        #   height = 200,
+                        #   card_header(div(
+                        #     "School Summary",
+                        #     tags$span(em("(Select a school from the table above)"),
+                        #               style = "font-size: 0.7em; color: grey;")
+                        #   )),
+                        #   uiOutput("TeacherShortage_Assessment")
+                        # ),
+                        col_widths = c(4, 8)
+                      )
+                    ) # <- End accordion_panel
+                  ) # <- End accordion
                   
-                  # --- Summary Cards ---
-                  layout_column_wrap(
-                    width = 1/4,
-                    card(
-                      card_header(strong("RO Filling-up Rate")),
-                      valueBoxOutput("f")
-                    ),
-                    card(
-                      card_header(strong("RO Unfilled Items")),
-                      valueBoxOutput("g")
-                    ),
-                    card(
-                      card_header(strong("SDO Filling-up Rate")),
-                      valueBoxOutput("a")
-                    ),
-                    card(
-                      card_header(strong("SDO Unfilled Items")),
-                      valueBoxOutput("b")
+                )
+              ),# <--- THIS WAS THE MISSING PARENTHESIS,
+              
+              # ----- TAB 2: NON-TEACHING (AO2) -----
+              nav_panel(
+                title = "Non-teaching Deployment",
+                value = "Non-teaching Deployment",
+                
+                tagList(
+                  h3("Non-teaching Deployment Overview"),
+                  
+                  
+                  # --- Accordion for the summary sections ---
+                  accordion(
+                    open = "Deployment Summary by Level",
+                    accordion_panel(
+                      title = "Deployment Summary by Level",
+                      icon = bsicons::bs_icon("people-fill"),
+                      
+                      # --- Tabbed summaries inside accordion ---
+                      navset_card_tab(
+                        nav_spacer(),
+                        
+                        # --- Regional Summary ---
+                        nav_panel(
+                          title = "Regional Summary",
+                          layout_column_wrap(
+                            width = 1/2,  # Two cards side by side
+                            card(
+                              card_header(strong("Schools under Clustered AO II Deployment")),
+                              valueBoxOutput("f2")
+                            ),
+                            card(
+                              card_header(strong("Schools with Dedicated AOII Deployment")),
+                              valueBoxOutput("g2")
+                            )
+                          )
+                        ),
+                        
+                        # --- Division Summary ---
+                        nav_panel(
+                          title = "Division Summary",
+                          layout_column_wrap(
+                            width = 1/2,
+                            card(
+                              card_header(strong("Schools under Clustered AO II Deployment")),
+                              valueBoxOutput("a2")
+                            ),
+                            card(
+                              card_header(strong("Schools with Dedicated AOII Deployment")),
+                              valueBoxOutput("b2")
+                            )
+                          )
+                        ),
+                        
+                        # --- District Summary ---
+                        nav_panel(
+                          title = "District Summary",
+                          layout_column_wrap(
+                            width = 1/2,
+                            card(
+                              card_header(strong("Schools under Clustered AO II Deployment")),
+                              valueBoxOutput("e2")
+                            ),
+                            card(
+                              card_header(strong("Schools with Dedicated AOII Deployment")),
+                              valueBoxOutput("h2")
+                            )
+                          )
+                        )
+                      )
                     )
-                    # card(
-                    #   card_header(strong("SDO Net Shortage")),
-                    #   valueBoxOutput("e")
-                    # )
                   ),
-
                   
+                  
+                  
+                  # --- This part stays outside the accordion ---
                   layout_columns(
                     card(
-                      card_header(strong("Teacher Excess and Shortage")),
-                      dataTableOutput("TeacherShortage_Table")
+                      card_header(
+                        div(
+                          strong("AO II Deployment Status"),
+                          tags$span(
+                            em("(as of September 2, 2025)"),
+                            style = "font-size: 0.8em; color: grey; margin-top: 0.1em; margin-bottom: 0;"
+                          )
+                        )
+                      ),
+                      dataTableOutput("AO2Table")
                     ),
                     card(
                       full_screen = TRUE,
                       card_header(strong("Personnel Deployment Mapping")),
-                      leafletOutput("TeacherShortage_Mapping", height = 700)
+                      leafletOutput("AO2Mapping", height = 800)
                     ),
-                    # card(
-                    #   height = 200,
-                    #   card_header(div(
-                    #     "School Summary",
-                    #     tags$span(em("(Select a school from the table above)"),
-                    #               style = "font-size: 0.7em; color: grey;")
-                    #   )),
-                    #   uiOutput("TeacherShortage_Assessment")
-                    # ),
-                    col_widths = c(4, 8)
-                  )
-                ) # <- End accordion_panel
-              ) # <- End accordion
-              
-            )
-          ),# <--- THIS WAS THE MISSING PARENTHESIS,
-          
-          # ----- TAB 2: NON-TEACHING (AO2) -----
-          nav_panel(
-            title = "Non-teaching Deployment",
-            value = "Non-teaching Deployment",
-            
-            tagList(
-              h3("Non-teaching Deployment Overview"),
-
-              
-              # --- Accordion for the summary sections ---
-              accordion(
-                open = "Deployment Summary by Level",
-                accordion_panel(
-                  title = "Deployment Summary by Level",
-                  icon = bsicons::bs_icon("people-fill"),
-                  
-                  # --- Tabbed summaries inside accordion ---
-                  navset_card_tab(
-                    nav_spacer(),
-                    
-                    # --- Regional Summary ---
-                    nav_panel(
-                      title = "Regional Summary",
-                      layout_column_wrap(
-                        width = 1/2,  # Two cards side by side
-                        card(
-                          card_header(strong("Schools under Clustered AO II Deployment")),
-                          valueBoxOutput("f2")
-                        ),
-                        card(
-                          card_header(strong("Schools with Dedicated AOII Deployment")),
-                          valueBoxOutput("g2")
-                        )
-                      )
-                    ),
-                    
-                    # --- Division Summary ---
-                    nav_panel(
-                      title = "Division Summary",
-                      layout_column_wrap(
-                        width = 1/2,
-                        card(
-                          card_header(strong("Schools under Clustered AO II Deployment")),
-                          valueBoxOutput("a2")
-                        ),
-                        card(
-                          card_header(strong("Schools with Dedicated AOII Deployment")),
-                          valueBoxOutput("b2")
-                        )
-                      )
-                    ),
-                    
-                    # --- District Summary ---
-                    nav_panel(
-                      title = "District Summary",
-                      layout_column_wrap(
-                        width = 1/2,
-                        card(
-                          card_header(strong("Schools under Clustered AO II Deployment")),
-                          valueBoxOutput("e2")
-                        ),
-                        card(
-                          card_header(strong("Schools with Dedicated AOII Deployment")),
-                          valueBoxOutput("h2")
-                        )
-                      )
-                    )
+                    col_widths = c(5,7)
                   )
                 )
               ),
               
-
-              
-              # --- This part stays outside the accordion ---
-              layout_columns(
-                card(
-                  card_header(
-                    div(
-                      strong("AO II Deployment Status"),
-                      tags$span(
-                        em("(as of September 2, 2025)"),
-                        style = "font-size: 0.8em; color: grey; margin-top: 0.1em; margin-bottom: 0;"
+              # ----- TAB 3: CLASSROOM INVENTORY -----
+              nav_panel(
+                title = "Classrooms",
+                value = "Classroom Inventory",
+                tagList(
+                  h3("Classroom Inventory Overview"),
+                  
+                  
+                  # --- Accordion for National and Shortage Summaries ---
+                  accordion(
+                    
+                    # ⃣Panel: National Overview
+                    accordion_panel(
+                      title = "National Classroom Inventory Overview",
+                      icon = bsicons::bs_icon("bar-chart-fill"),
+                      layout_columns(
+                        # card(
+                        #   full_screen = TRUE,
+                        #   card_header(
+                        #     tagList(
+                        #       strong("Classroom Shortage Breakdown"),
+                        #       tags$br(),
+                        #       tags$em("(n = 165,443)")
+                        #     )
+                        #   ),
+                        #   # Start of Tabset
+                        #   navset_tab(
+                        #     # Tab 1: Regional Classroom Breakdown (Your existing content)
+                        #     # nav_panel("Regional Breakdown",
+                        #     #           plotlyOutput("Classroom_Shortage_Region_Graph2")
+                        #     # ),
+                        #     # Tab 2: Division Classroom Shortage Breakdown (The new tab)
+                        #     # nav_panel("Priority Divisions",
+                        #     #           plotlyOutput("Classroom_Shortage_Division_Graph2")
+                        #     # ),
+                        #     nav_panel("Dataset",
+                        #               dataTableOutput("Classroom_Shortage_Dataset"))
+                        #   )),
+                        # # End of Tabset
+                        
+                        card(
+                          card_header(strong("Regional Classroom Shortage")),
+                          valueBoxOutput("ROCRShort")
+                        ),
+                        card(
+                          card_header(strong("Division Classroom Shortage")),
+                          valueBoxOutput("SDOCRShort")
+                        ),
+                        #card(
+                        # card_header(strong("District Classroom Shortage")),
+                        #valueBoxOutput("DistCRShort")
+                        #),
+                        col_widths = c(6,6)
                       )
                     )
                   ),
-                  dataTableOutput("AO2Table")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("Personnel Deployment Mapping")),
-                  leafletOutput("AO2Mapping", height = 800)
-                ),
-                col_widths = c(5,7)
-              )
-            )
-          ),
-          
-          # ----- TAB 3: CLASSROOM INVENTORY -----
-          nav_panel(
-            title = "Classrooms",
-            value = "Classroom Inventory",
-            tagList(
-              h3("Classroom Inventory Overview"),
-
-              
-              # --- Accordion for National and Shortage Summaries ---
-              accordion(
-                
-                # ⃣Panel: National Overview
-                accordion_panel(
-                  title = "National Classroom Inventory Overview",
-                  icon = bsicons::bs_icon("bar-chart-fill"),
+                  
+                  
+                  
+                  # --- Table and Mapping ---
                   layout_columns(
-                    # card(
-                    #   full_screen = TRUE,
-                    #   card_header(
-                    #     tagList(
-                    #       strong("Classroom Shortage Breakdown"),
-                    #       tags$br(),
-                    #       tags$em("(n = 165,443)")
-                    #     )
-                    #   ),
-                    #   # Start of Tabset
-                    #   navset_tab(
-                    #     # Tab 1: Regional Classroom Breakdown (Your existing content)
-                    #     # nav_panel("Regional Breakdown",
-                    #     #           plotlyOutput("Classroom_Shortage_Region_Graph2")
-                    #     # ),
-                    #     # Tab 2: Division Classroom Shortage Breakdown (The new tab)
-                    #     # nav_panel("Priority Divisions",
-                    #     #           plotlyOutput("Classroom_Shortage_Division_Graph2")
-                    #     # ),
-                    #     nav_panel("Dataset",
-                    #               dataTableOutput("Classroom_Shortage_Dataset"))
-                    #   )),
-                    # # End of Tabset
-                    
                     card(
-                      card_header(strong("Regional Classroom Shortage")),
-                      valueBoxOutput("ROCRShort")
+                      full_screen = TRUE,
+                      card_header(strong("Classroom Shortage")),
+                      dataTableOutput("CLTable")
                     ),
                     card(
-                      card_header(strong("Division Classroom Shortage")),
-                      valueBoxOutput("SDOCRShort")
-                    ),
-                    #card(
-                    # card_header(strong("District Classroom Shortage")),
-                    #valueBoxOutput("DistCRShort")
-                    #),
-                    col_widths = c(6,6)
+                      full_screen = TRUE,
+                      card_header(strong("School Mapping")),
+                      leafletOutput("CLMapping", height = 800)
+                    )
                   )
                 )
               ),
               
-
-              
-              # --- Table and Mapping ---
-              layout_columns(
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("Classroom Shortage")),
-                  dataTableOutput("CLTable")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("School Mapping")),
-                  leafletOutput("CLMapping", height = 800)
-                )
-              )
-            )
-          ),
-          
-          # ----- TAB 4: LEARNER CONGESTION -----
-          nav_panel(
-            title = "Congestion",
-            value = "Learner Congestion",
-            
-            tagList(
-              h3("Learner Congestion Mapping (SY 2023-2024)"),
-
-              
-              # # --- Accordion Wrapper ---
-              # accordion(
-              #   open = "Learner Congestion Overview",
-              #   
-              #   accordion_panel(
-              #     title = "Learner Congestion Overview",
-              #     icon = bsicons::bs_icon("diagram-3-fill"),
-              #     
-              #     # --- Start of Tabset ---
-              #     navset_tab(
-              #       nav_panel("Regional Breakdown",
-              #                 plotlyOutput("Congest_Regional_Graph")
-              #       ),
-              #       nav_panel("Division Breakdown",
-              #                 plotlyOutput("Congest_Division_Graph")
-              #       ),
-              #       nav_panel("Dataset",
-              #                 dataTableOutput("Congest_Dataset")
-              #       )
-              #     )
-              #     # --- End of Tabset ---
-              #   )
-              # ),
-              
-
-              
-              layout_columns(
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("Congestion Summary Table")),
-                  dataTableOutput("CongestTable")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("School Mapping")),
-                  leafletOutput("CongestMapping", height = 800)
-                )
-              )
-            )
-          ),
-          
-          # ----- TAB 5: INDUSTRIES (SHS) -----
-          nav_panel(
-            title = "Industries (SHS)",
-            value = "Industries",
-            
-            tagList(
-              h3("Industries Overview"),
-              
-              # --- Accordion for Industry Summary and others ---
-              accordion(
-                open = "Industry Summary",
+              # ----- TAB 4: LEARNER CONGESTION -----
+              nav_panel(
+                title = "Congestion",
+                value = "Learner Congestion",
                 
-                #  Panel: Industry Summary
-                accordion_panel(
-                  title = "Industry Summary",
-                  icon = bsicons::bs_icon("bar-chart"),
+                tagList(
+                  h3("Learner Congestion Mapping (SY 2023-2024)"),
                   
-                  # # --- Industry Distribution Overview Card placed FIRST ---
-                  # card(
-                  #   full_screen = TRUE,
-                  #   card_header(
-                  #     tagList(
-                  #       strong("Industry Breakdown"),
-                  #       tags$br(),
-                  #       tags$em("(n = )")
-                  #     )
-                  #   ),
+                  
+                  # # --- Accordion Wrapper ---
+                  # accordion(
+                  #   open = "Learner Congestion Overview",
                   #   
-                  #   # --- Tabset ---
-                  #   navset_tab(
-                  #     nav_panel("Regional Breakdown",
-                  #               plotlyOutput("Ind_Regional_Graph")
-                  #     ),
-                  #     # nav_panel("Priority Divisions",
-                  #     #           plotlyOutput("Ind_Division_Graph")
-                  #     # ),
-                  #     nav_panel("Dataset",
-                  #               dataTableOutput("Ind_Dataset")
+                  #   accordion_panel(
+                  #     title = "Learner Congestion Overview",
+                  #     icon = bsicons::bs_icon("diagram-3-fill"),
+                  #     
+                  #     # --- Start of Tabset ---
+                  #     navset_tab(
+                  #       nav_panel("Regional Breakdown",
+                  #                 plotlyOutput("Congest_Regional_Graph")
+                  #       ),
+                  #       nav_panel("Division Breakdown",
+                  #                 plotlyOutput("Congest_Division_Graph")
+                  #       ),
+                  #       nav_panel("Dataset",
+                  #                 dataTableOutput("Congest_Dataset")
+                  #       )
                   #     )
+                  #     # --- End of Tabset ---
                   #   )
                   # ),
-                  # 
-                  # # --- Divider line for better separation ---
-                  # hr(),
-                  # 
-                  # --- Summary Counts ---
-                  layout_column_wrap(
-                    width = 1/2,
+                  
+                  
+                  
+                  layout_columns(
                     card(
-                      card_header(strong("Total SHS Count")),
-                      valueBoxOutput("SHSCountUniv")
+                      full_screen = TRUE,
+                      card_header(strong("Congestion Summary Table")),
+                      dataTableOutput("CongestTable")
                     ),
                     card(
-                      card_header(strong("Total Industry Count")),
-                      valueBoxOutput("IndCount")
+                      full_screen = TRUE,
+                      card_header(strong("School Mapping")),
+                      leafletOutput("CongestMapping", height = 800)
+                    )
+                  )
+                )
+              ),
+              
+              # ----- TAB 5: INDUSTRIES (SHS) -----
+              nav_panel(
+                title = "Industries (SHS)",
+                value = "Industries",
+                
+                tagList(
+                  h3("Industries Overview"),
+                  
+                  # --- Accordion for Industry Summary and others ---
+                  accordion(
+                    open = "Industry Summary",
+                    
+                    #  Panel: Industry Summary
+                    accordion_panel(
+                      title = "Industry Summary",
+                      icon = bsicons::bs_icon("bar-chart"),
+                      
+                      # # --- Industry Distribution Overview Card placed FIRST ---
+                      # card(
+                      #   full_screen = TRUE,
+                      #   card_header(
+                      #     tagList(
+                      #       strong("Industry Breakdown"),
+                      #       tags$br(),
+                      #       tags$em("(n = )")
+                      #     )
+                      #   ),
+                      #   
+                      #   # --- Tabset ---
+                      #   navset_tab(
+                      #     nav_panel("Regional Breakdown",
+                      #               plotlyOutput("Ind_Regional_Graph")
+                      #     ),
+                      #     # nav_panel("Priority Divisions",
+                      #     #           plotlyOutput("Ind_Division_Graph")
+                      #     # ),
+                      #     nav_panel("Dataset",
+                      #               dataTableOutput("Ind_Dataset")
+                      #     )
+                      #   )
+                      # ),
+                      # 
+                      # # --- Divider line for better separation ---
+                      # hr(),
+                      # 
+                      # --- Summary Counts ---
+                      layout_column_wrap(
+                        width = 1/2,
+                        card(
+                          card_header(strong("Total SHS Count")),
+                          valueBoxOutput("SHSCountUniv")
+                        ),
+                        card(
+                          card_header(strong("Total Industry Count")),
+                          valueBoxOutput("IndCount")
+                        )
+                      ),
+                      
+                      # --- Nearby Industry Count ---
+                      card(
+                        card_header("Nearby Industry Count (~10 km radius):"),
+                        layout_column_wrap(
+                          width = 1/6,
+                          card(
+                            card_header(strong("Manufacturing and Engineering")),
+                            valueBoxOutput("AccoCount")
+                          ),
+                          card(
+                            card_header(strong("Hospitality and Tourism")),
+                            valueBoxOutput("ProfCount")
+                          ),
+                          card(
+                            card_header(strong("Public Administration")),
+                            valueBoxOutput("TranCount")
+                          ),
+                          card(
+                            card_header(strong("Professional/Private Services")),
+                            valueBoxOutput("WastCount")
+                          ),
+                          card(
+                            card_header(strong("Business and Finance")),
+                            valueBoxOutput("WholCount")
+                          ),
+                          card(
+                            card_header(strong("Agriculture and Agri-business")),
+                            valueBoxOutput("WholCount2")
+                          )
+                        )
+                      )
                     )
                   ),
                   
-                  # --- Nearby Industry Count ---
-                  card(
-                    card_header("Nearby Industry Count (~10 km radius):"),
-                    layout_column_wrap(
-                      width = 1/6,
-                      card(
-                        card_header(strong("Manufacturing and Engineering")),
-                        valueBoxOutput("AccoCount")
-                      ),
-                      card(
-                        card_header(strong("Hospitality and Tourism")),
-                        valueBoxOutput("ProfCount")
-                      ),
-                      card(
-                        card_header(strong("Public Administration")),
-                        valueBoxOutput("TranCount")
-                      ),
-                      card(
-                        card_header(strong("Professional/Private Services")),
-                        valueBoxOutput("WastCount")
-                      ),
-                      card(
-                        card_header(strong("Business and Finance")),
-                        valueBoxOutput("WholCount")
-                      ),
-                      card(
-                        card_header(strong("Agriculture and Agri-business")),
-                        valueBoxOutput("WholCount2")
-                      )
+                  
+                  # --- Remaining Layout: SHS list, mapping, etc. ---
+                  layout_columns(
+                    card(
+                      card_header(strong("List of SHS")),
+                      dataTableOutput("SHSListTable")
+                    ),
+                    card(
+                      full_screen = TRUE,
+                      card_header(strong("SHS to Industry Mapping")),
+                      leafletOutput("SHSMapping", height = 700, width = "100%")
+                    ),
+                    card(
+                      full_screen = TRUE,
+                      card_header(div(strong("School Profile"),
+                                      tags$span(em("(Select a school in the table above)"),
+                                                style = "font-size: 0.7em; color: grey;")
+                      )),
+                      tableOutput("SHSTablex")
+                    ),
+                    card(
+                      full_screen = TRUE,
+                      card_header(div(strong("Specialization Data"),
+                                      tags$span(em("(based on eSF7 for SY 2023-2024)"),
+                                                style = "font-size: 0.7em; color: grey;")
+                      )),
+                      tableOutput("PilotSpec")
+                    ),
+                    card(
+                      card_header(div(strong("Nearby Industries"),
+                                      tags$span(em("(Select a school in the table above)"),
+                                                style = "font-size: 0.7em; color: grey;")
+                      )),
+                      dataTableOutput("dataTableSHS")
+                    ),
+                    col_widths = c(4, 8, 6, 6, 12)
+                  )
+                )
+              ),
+              
+              # ----- TAB 6: FACILITIES -----
+              nav_panel(
+                title = "Facilities",
+                value = "Facilities",
+                
+                tagList(
+                  h3("Education Facilities Mapping"),
+                  
+                  # # --- Accordion Wrapper ---
+                  # accordion(
+                  #   open = "Facilities Overview",
+                  #   
+                  #   accordion_panel(
+                  #     title = "Facilities Overview",
+                  #     icon = bsicons::bs_icon("building"),
+                  #     
+                  #     # --- Start of Tabset ---
+                  #     navset_tab(
+                  #       nav_panel("Regional Breakdown",
+                  #                 plotlyOutput("Facilities_Regional_Graph")
+                  #       ),
+                  #       nav_panel("Division Breakdown",
+                  #                 plotlyOutput("Facilities_Division_Graph")
+                  #       ),
+                  #       nav_panel("Dataset",
+                  #                 dataTableOutput("Facilities_Dataset")
+                  #       )
+                  #     )
+                  #     # --- End of Tabset ---
+                  #   )
+                  # ),
+                  
+                  
+                  layout_columns(
+                    card(
+                      full_screen = TRUE,
+                      card_header(strong("School Project Allocation per Funding Year")),
+                      dataTableOutput("FacTable")
+                    ),
+                    card(
+                      full_screen = TRUE,
+                      card_header(strong("School Mapping")),
+                      leafletOutput("FacMapping", height = 800)
                     )
                   )
                 )
               ),
               
-              
-              # --- Remaining Layout: SHS list, mapping, etc. ---
-              layout_columns(
-                card(
-                  card_header(strong("List of SHS")),
-                  dataTableOutput("SHSListTable")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("SHS to Industry Mapping")),
-                  leafletOutput("SHSMapping", height = 700, width = "100%")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(div(strong("School Profile"),
-                                  tags$span(em("(Select a school in the table above)"),
-                                            style = "font-size: 0.7em; color: grey;")
-                  )),
-                  tableOutput("SHSTablex")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(div(strong("Specialization Data"),
-                                  tags$span(em("(based on eSF7 for SY 2023-2024)"),
-                                            style = "font-size: 0.7em; color: grey;")
-                  )),
-                  tableOutput("PilotSpec")
-                ),
-                card(
-                  card_header(div(strong("Nearby Industries"),
-                                  tags$span(em("(Select a school in the table above)"),
-                                            style = "font-size: 0.7em; color: grey;")
-                  )),
-                  dataTableOutput("dataTableSHS")
-                ),
-                col_widths = c(4, 8, 6, 6, 12)
-              )
-            )
-          ),
-          
-          # ----- TAB 6: FACILITIES -----
-          nav_panel(
-            title = "Facilities",
-            value = "Facilities",
-            
-            tagList(
-              h3("Education Facilities Mapping"),
-              
-              # # --- Accordion Wrapper ---
-              # accordion(
-              #   open = "Facilities Overview",
-              #   
-              #   accordion_panel(
-              #     title = "Facilities Overview",
-              #     icon = bsicons::bs_icon("building"),
-              #     
-              #     # --- Start of Tabset ---
-              #     navset_tab(
-              #       nav_panel("Regional Breakdown",
-              #                 plotlyOutput("Facilities_Regional_Graph")
-              #       ),
-              #       nav_panel("Division Breakdown",
-              #                 plotlyOutput("Facilities_Division_Graph")
-              #       ),
-              #       nav_panel("Dataset",
-              #                 dataTableOutput("Facilities_Dataset")
-              #       )
-              #     )
-              #     # --- End of Tabset ---
-              #   )
-              # ),
-
-              
-              layout_columns(
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("School Project Allocation per Funding Year")),
-                  dataTableOutput("FacTable")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("School Mapping")),
-                  leafletOutput("FacMapping", height = 800)
-                )
-              )
-            )
-          ),
-          
-          # ----- TAB 7: LAST MILE SCHOOLS -----
-          nav_panel(
-            title = "Last Mile Schools",
-            value = "Last Mile School",
-            
-            tagList(
-              h3("Last Mile Schools (LMS) Overview"),
-              
-              # --- Accordion for LMS Summaries ---
-              accordion(
-                open = "National and Regional Breakdown",  # optional: open first panel by default
+              # ----- TAB 7: LAST MILE SCHOOLS -----
+              nav_panel(
+                title = "Last Mile Schools",
+                value = "Last Mile School",
                 
-                # 1️⃣ Panel: National + Regional Breakdown
-                accordion_panel(
-                  title = "National and Regional Breakdown",
-                  icon = bsicons::bs_icon("bar-chart"),
+                tagList(
+                  h3("Last Mile Schools (LMS) Overview"),
+                  
+                  # --- Accordion for LMS Summaries ---
+                  accordion(
+                    open = "National and Regional Breakdown",  # optional: open first panel by default
+                    
+                    # 1️⃣ Panel: National + Regional Breakdown
+                    accordion_panel(
+                      title = "National and Regional Breakdown",
+                      icon = bsicons::bs_icon("bar-chart"),
+                      layout_columns(
+                        # card(
+                        #   full_screen = TRUE,
+                        #   card_header(
+                        #     tagList(
+                        #       strong("Breakdown of Last Mile Schools"),
+                        #       tags$br(),
+                        #       tags$em("(n = 9,100)")
+                        #     )
+                        #   ),
+                        #   # Start of Tabset
+                        #   navset_tab(
+                        #     # Tab 1: Regional Breakdown (Your existing content)
+                        #     # nav_panel("Regional Breakdown",
+                        #     #           plotlyOutput("LMS_Nation_Graph2")
+                        #     # ),
+                        #     # # Tab 2: Division Breakdown (The new tab)
+                        #     # nav_panel("Priority Divisions",
+                        #     #           plotlyOutput("LMS_Division_Graph2")
+                        #     # ),
+                        #     nav_panel("Dataset",
+                        #               dataTableOutput("LMS_Dataset")
+                        #     )
+                        #   )),
+                        card(
+                          card_header(strong("Total Last Mile Schools by Region")),
+                          valueBoxOutput("LMS_Total_Region")
+                        ),
+                        card(
+                          card_header(strong("Total Last Mile Schools by Division")),
+                          valueBoxOutput("LMS_Total_Division")
+                        ),
+                        col_widths = c(6,6)
+                      )
+                    )
+                  ),
+                  
                   layout_columns(
-                    # card(
-                    #   full_screen = TRUE,
-                    #   card_header(
-                    #     tagList(
-                    #       strong("Breakdown of Last Mile Schools"),
-                    #       tags$br(),
-                    #       tags$em("(n = 9,100)")
-                    #     )
-                    #   ),
-                    #   # Start of Tabset
-                    #   navset_tab(
-                    #     # Tab 1: Regional Breakdown (Your existing content)
-                    #     # nav_panel("Regional Breakdown",
-                    #     #           plotlyOutput("LMS_Nation_Graph2")
-                    #     # ),
-                    #     # # Tab 2: Division Breakdown (The new tab)
-                    #     # nav_panel("Priority Divisions",
-                    #     #           plotlyOutput("LMS_Division_Graph2")
-                    #     # ),
-                    #     nav_panel("Dataset",
-                    #               dataTableOutput("LMS_Dataset")
-                    #     )
-                    #   )),
                     card(
-                      card_header(strong("Total Last Mile Schools by Region")),
-                      valueBoxOutput("LMS_Total_Region")
+                      full_screen = TRUE,
+                      card_header(strong("List of Last Mile Schools")),
+                      dataTableOutput("LMSTable")
                     ),
                     card(
-                      card_header(strong("Total Last Mile Schools by Division")),
-                      valueBoxOutput("LMS_Total_Division")
+                      full_screen = TRUE,
+                      card_header(strong("LMS Mapping")),
+                      leafletOutput("LMSMapping", height = 800)
                     ),
-                    col_widths = c(6,6)
+                    col_widths = c(6, 6)
                   )
                 )
-              ),
-
-              layout_columns(
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("List of Last Mile Schools")),
-                  dataTableOutput("LMSTable")
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header(strong("LMS Mapping")),
-                  leafletOutput("LMSMapping", height = 800)
-                ),
-                col_widths = c(6, 6)
+              ) 
+            ) # Close inner navset_card_tab
+          ) # Close layout_sidebar
+        ), # Close Standard View nav_panel
+        
+        nav_panel(
+          title = tagList("Immersive View", span("NEW", class = "badge bg-danger ms-2")),
+          # Full screen map container (no card)
+          div(style="position: relative; height: calc(100vh - 100px); width: 100%;",
+              leafletOutput("ImmersiveMap", height = "100%", width = "100%"),
+              absolutePanel(
+                top = 20, left = 60, width = 300,
+                draggable = TRUE,
+                style = "z-index: 1000;",
+                bslib::accordion(
+                  open = "Map Controls",
+                  bslib::accordion_panel(
+                    "Map Controls",
+                    icon = bs_icon("sliders"),
+                    radioGroupButtons(
+                      inputId = "Immersive_Layer",
+                      label = "Select Layer:",
+                      choices = c("All Schools", "Last Mile School", "Teacher Shortage", "Classroom Shortage"),
+                      selected = "Last Mile School",
+                      justified = TRUE,
+                      status = "primary",
+                      size = "sm"
+                    ),
+                    pickerInput(
+                      inputId = "Immersive_Region",
+                      label = "Filter Region:",
+                      choices = c("All Regions", "Region I", "Region II", "Region III", "Region IV-A", "MIMAROPA", 
+                                  "Region V", "Region VI", "NIR", "Region VII", "Region VIII", 
+                                  "Region IX", "Region X", "Region XI", "Region XII", "CARAGA", 
+                                  "CAR", "NCR"), 
+                      selected = "All Regions",
+                      options = list(`live-search` = TRUE, `container` = "body")
+                    ),
+                    selectizeInput(
+                      inputId = "Immersive_Search",
+                      label = "Search School:",
+                      choices = NULL,
+                      options = list(placeholder = 'Type to search school name...', maxOptions = 10, dropdownParent = 'body')
+                    )
+                  )
+                )
               )
-            )
           )
         )
-      )
-    ), # End Mapping nav_panel
+      ) # Close outer navset_card_tab
+    ), # End Resource Mapping nav_panel
     
     # --- CLOUD MENU ---
     nav_menu(
@@ -1644,7 +1694,9 @@ output$STRIDE2 <- renderUI({
     tags$div(
       id = "strideHelpOverlay", 
       class = "help-drawer-overlay", 
-      onclick = "toggleHelpDrawer()" # Click outside to close
+      onclick = "toggleHelpDrawer()", # Click outside to close
+      role = "button", # Added role for accessibility
+      tabindex = "0"   # Added tabindex for accessibility
     ),
     
     # --- DRAWER CONTAINER ---

@@ -51,12 +51,46 @@ uni <- left_join(uni48k, uni45k, by = "SchoolID") %>%
       tolower(trimws(With_Buildable_space)) == "yes" ~ "Yes",
       tolower(trimws(With_Buildable_space)) == "no" ~ "No",
       TRUE ~ NA_character_
-    )
+    ),
+    # Convert Lat/Long to numeric (from CSV)
+    Lat = as.numeric(as.character(Lat)),
+    Long = as.numeric(as.character(Long)),
+    # Convert Latitude/Longitude to numeric
+    Latitude = as.numeric(as.character(Latitude)),
+    Longitude = as.numeric(as.character(Longitude)),
+    # Consolidate coordinates: Use Latitude/Longitude as base, override with Lat/Long if not NA
+    Latitude = ifelse(!is.na(Lat), Lat, Latitude),
+    Longitude = ifelse(!is.na(Long), Long, Longitude)
   ) %>%
   select(
-    1, 73, 69:72, 74:84, 2:4, 62, 64, 68, 85:116, 123:129, 153:168, 186:197,
-    everything()
+    # Explicitly select essential keys and the rest
+    SchoolID, Region, Division, Municipality, School.Name, 
+    Latitude, Longitude,  # Use consolidated coordinate columns
+    everything(),
+    -Lat, -Long  # Remove the old Lat/Long columns to avoid confusion
   )
+
+# --- APPLY MANUAL COORDINATE OVERRIDES ---
+if (file.exists("school_coordinates.csv")) {
+  message("Loading manual coordinate overrides...")
+  manual_coords <- read.csv("school_coordinates.csv", stringsAsFactors = FALSE) %>%
+    select(SchoolID, Latitude, Longitude) %>%
+    mutate(
+      SchoolID = as.integer(SchoolID),
+      Latitude = as.numeric(Latitude),
+      Longitude = as.numeric(Longitude)
+    ) %>%
+    filter(!is.na(Latitude) & !is.na(Longitude))
+  
+  uni <- uni %>%
+    left_join(manual_coords, by = "SchoolID", suffix = c("", ".manual")) %>%
+    mutate(
+      Latitude = ifelse(!is.na(Latitude.manual), Latitude.manual, Latitude),
+      Longitude = ifelse(!is.na(Longitude.manual), Longitude.manual, Longitude)
+    ) %>%
+    select(-Latitude.manual, -Longitude.manual)
+  message(paste("Applied overrides for", nrow(manual_coords), "schools."))
+}
 
 # --- ADVANCED ANALYTICS SETUP ---
 print("--- ADVANCED ANALYTICS: Starting column analysis... ---")
@@ -388,6 +422,7 @@ server <- function(input, output, session) {
   source("server_parts/23_plantilla_dynamic_db.R", local = TRUE)
   source("server_parts/24_renderleaflet_resource_mapping.R", local = TRUE)
   source("server_parts/25_mapping_run.R", local = TRUE)
+  source("server_parts/26_immersive_view.R", local = TRUE)
   source("server_parts/26_rows_selected_for_datatables.R", local = TRUE)
   source("server_parts/27_cloud_graphs_and_tables.R", local = TRUE)
   source("server_parts/31_build_your_dashboard.R", local = TRUE)

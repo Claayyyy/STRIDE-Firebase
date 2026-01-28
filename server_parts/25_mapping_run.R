@@ -62,7 +62,7 @@ data_TS <- eventReactive(input$Mapping_Run, {
   df %>% 
     filter(Region == inputs$RegRCT) %>% 
     filter(Division == inputs$SDORCT1) %>% 
-    filter(Legislative.District == inputs$DistRCT1) %>% 
+    filter(Legislative.District %in% inputs$DistRCT1) %>% 
     filter(Level == inputs$Lev)
 })
 
@@ -116,7 +116,7 @@ data_NTP <- eventReactive(input$Mapping_Run, {
   uni %>% 
     filter(Region == inputs$RegRCT) %>% 
     filter(Division == inputs$SDORCT1) %>% 
-    filter(Legislative.District == inputs$DistRCT1)
+    filter(Legislative.District %in% inputs$DistRCT1)
 })
 
 # ----- Data for ValueBoxes (mainreactreg, mainreactdiv) -----
@@ -139,7 +139,7 @@ data_CR <- eventReactive(input$Mapping_Run, {
   uni %>% 
     filter(Region == inputs$RegRCT) %>% 
     filter(Division == inputs$SDORCT1) %>% 
-    filter(Legislative.District == inputs$DistRCT1) %>% 
+    filter(Legislative.District %in% inputs$DistRCT1) %>% 
     distinct(SchoolID, .keep_all = TRUE) %>% 
     arrange(desc(SBPI))
 })
@@ -165,7 +165,7 @@ data_SHS <- eventReactive(input$Mapping_Run, {
   df %>% 
     filter(Region == inputs$RegRCT) %>% 
     filter(Division == inputs$SDORCT1) %>% 
-    filter(Legislative.District == inputs$DistRCT1) %>% 
+    filter(Legislative.District %in% inputs$DistRCT1) %>% 
     filter(Level == "SHS") %>% 
     distinct(SchoolID, .keep_all = TRUE)
 })
@@ -216,6 +216,15 @@ data_EFD <- eventReactive(input$Mapping_Run, {
 
 # --- 2. MAP PROXY OBSERVERS (STRICT BUTTON TRIGGER ONLY) ---
 
+output$ImmersiveMap <- renderLeaflet({
+  leaflet() %>%
+    setView(lng = 122, lat = 13, zoom = 6) %>%
+    addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+    addProviderTiles(providers$OpenStreetMap.Mapnik, group = "Road Map") %>% 
+    addMeasure(position = "topright", primaryLengthUnit = "kilometers", primaryAreaUnit = "sqmeters") %>% 
+    addLayersControl(baseGroups = c("Satellite","Road Map"))
+})
+
 # ==============================================================================
 # PATTERN EXPLANATION:
 # We only use "Observer A" which listens to the data_X() reactives.
@@ -247,6 +256,25 @@ observeEvent(data_LMS(), {
                              )),
       label = paste("School Name:",map_data$School_Name) %>% lapply(htmltools::HTML)
     )
+    
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Last Mile School") {
+    leafletProxy("ImmersiveMap") %>%
+      clearMarkers() %>%
+      clearMarkerClusters() %>%
+      setView(lng = map_data$Longitude[1], lat = map_data$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 12),
+        lng = map_data$Longitude,
+        lat = map_data$Latitude,
+        icon = makeAwesomeIcon(icon = "education", library = "glyphicon",
+                               markerColor = case_when(
+                                 (map_data$Buildable_space == 0 & map_data$Estimated_CL_Shortage == 0) ~ "gray",
+                                 map_data$Buildable_space == 0 ~ "red",
+                                 map_data$Buildable_space == 1 ~ "green",
+                               )),
+        label = paste("School Name:",map_data$School_Name) %>% lapply(htmltools::HTML)
+      )
+  }
 })
 
 # ----- SHS Map -----
@@ -294,6 +322,42 @@ observeEvent(data_SHS(), {
       label = values.ind
     )
   }
+  
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Industries") {
+      proxy_imm <- leafletProxy("ImmersiveMap") %>%
+      clearMarkers() %>%
+      clearMarkerClusters() %>%
+      setView(lng = mainreactSHS$Longitude[1], lat = mainreactSHS$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15),
+        lng = mainreactSHS$Longitude,
+        lat = mainreactSHS$Latitude,
+        icon = makeAwesomeIcon(icon = "university", library = "fa", markerColor = "orange"),
+        label = values_industry
+      )
+    
+    if (!is.null(mainreactind) && nrow(mainreactind) > 0) {
+      proxy_imm %>% addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 12),
+        lng = mainreactind$Longitude,
+        lat = mainreactind$Latitude,
+        icon = makeAwesomeIcon(
+          icon = "cog",
+          library = "fa",
+          markerColor = dplyr::case_when(
+            mainreactind$Sector == "Manufacturing and Engineering"     ~ "red",
+            mainreactind$Sector == "Hospitality and Tourism"           ~ "orange",
+            mainreactind$Sector == "Professional/Private Services"     ~ "purple",
+            mainreactind$Sector == "Public Administration"             ~ "green",
+            mainreactind$Sector == "Business and Finance"              ~ "blue",
+            mainreactind$Sector == "Agriculture and Agri-business"     ~ "pink",
+            TRUE                                                      ~ "gray"
+          )
+        ),
+        label = values.ind
+      )
+    }
+  }
 })
 
 # ----- CL Map -----
@@ -324,6 +388,27 @@ observeEvent(data_CR(), {
         iconColor = "white"
       )
     )
+    
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Classroom Inventory") {
+    leafletProxy("ImmersiveMap") %>%
+      clearMarkers() %>%
+      clearMarkerClusters() %>%
+      setView(lng = mainreactCR$Longitude[1], lat = mainreactCR$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15),
+        lng = mainreactCR$Longitude,
+        lat = mainreactCR$Latitude,
+        popup = values_classrooom_shortage_popup,
+        label = values_classrooom_shortage,
+        labelOptions = labelOptions(noHide = FALSE, textsize = "12px", direction = "top"),
+        icon = awesomeIcons(
+          icon = "university",
+          library = "fa",
+          markerColor = case_when(suppressWarnings(as.numeric(mainreactCR$Classroom.Shortage)) > 0 ~ "red", TRUE ~ "green"),
+          iconColor = "white"
+        )
+      )
+  }
 })
 
 # ----- AO2 Map -----
@@ -359,6 +444,32 @@ observeEvent(data_NTP(), {
         )
       )
     )
+    
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Non-teaching Deployment") {
+    leafletProxy("ImmersiveMap") %>%
+      clearMarkers() %>%
+      clearMarkerClusters() %>%
+      setView(lng = mainreactNTP$Longitude[1], lat = mainreactNTP$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15),
+        lng = mainreactNTP$Longitude,
+        lat = mainreactNTP$Latitude,
+        popup = values.non_teaching_popup,
+        label = values.non_teaching,
+        labelOptions = labelOptions(noHide = FALSE, textsize = "12px", direction = "top"),
+        icon = makeAwesomeIcon(
+          icon = "user",
+          library = "fa",
+          markerColor = case_when(
+            mainreactNTP$Clustering.Status %in% c("Dedicated","Clustered") & mainreactNTP$PDOI_Deployment == "With PDO I" ~ "green",
+            mainreactNTP$Clustering.Status %in% c("Dedicated","Clustered") & mainreactNTP$PDOI_Deployment == "Without PDO I" ~ "orange",
+            mainreactNTP$Clustering.Status == "None Deployed" & mainreactNTP$PDOI_Deployment == "With PDO I" ~ "orange",
+            mainreactNTP$Clustering.Status == "None Deployed" & mainreactNTP$PDOI_Deployment == "Without PDO I" ~ "red",
+            TRUE ~ "lightgray"
+          )
+        )
+      )
+  }
 })
 
 # ----- Teacher Shortage Map -----
@@ -386,6 +497,24 @@ observeEvent(data_TS(), {
                                                                      mainreact1$TeacherExcess > 0 ~ "blue", 
                                                                      (mainreact1$TeacherExcess == 0 & mainreact1$TeacherShortage == 0) ~ "green", 
                                                                      is.na(mainreact1$TeacherShortage) ~ "gray")))
+                                                                     
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Teaching Deployment") {
+    leafletProxy("ImmersiveMap") %>% 
+      clearMarkers() %>% 
+      clearMarkerClusters() %>% 
+      setView(lng = mainreact1$Longitude[1], lat = mainreact1$Latitude[1], zoom = 7) %>% 
+      addAwesomeMarkers(clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15), 
+                        lng = mainreact1$Longitude, 
+                        lat = mainreact1$Latitude, 
+                        popup = values_teacher_shortage_popup, 
+                        label = values_teacher_shortage, 
+                        labelOptions = labelOptions(noHide = F, textsize = "12px", direction = "top"), 
+                        icon = makeAwesomeIcon(icon = "education", library = "glyphicon", 
+                                               markerColor = case_when(mainreact1$TeacherShortage > 0 ~ "red", 
+                                                                       mainreact1$TeacherExcess > 0 ~ "blue", 
+                                                                       (mainreact1$TeacherExcess == 0 & mainreact1$TeacherShortage == 0) ~ "green", 
+                                                                       is.na(mainreact1$TeacherShortage) ~ "gray")))
+  }
 })
 
 # ----- Facilities (EFD) Map Observer -----
@@ -430,8 +559,45 @@ observeEvent(data_EFD(), {
           mainreactEFD$FundingCategory == "After 2030" ~ "blue"
         )
       )
+
     ) %>% # <--- Ensure this closing parenthesis matches addAwesomeMarkers
     addLegend("bottomright", pal = color_palette, values = ~FundingCategory, title = "Funding Year", opacity = 1)
+    
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Facilities") {
+    leafletProxy("ImmersiveMap", data = mainreactEFD) %>%
+      clearMarkers() %>%
+      clearControls() %>%
+      setView(lng = mainreactEFD$Longitude[1], lat = mainreactEFD$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15),
+        lng = ~Longitude,
+        lat = ~Latitude,
+        label = values.efdmasterlist, 
+        
+        # Optional: Customize how the hover box looks
+        labelOptions = labelOptions(
+          noHide = FALSE,
+          direction = "auto",
+          textsize = "12px",
+          style = list(
+            "font-weight" = "bold",
+            "padding" = "3px 8px",
+            "border-radius" = "5px"
+          )
+        ),
+        
+        icon = makeAwesomeIcon(
+          icon = "education",
+          library = "glyphicon",
+          markerColor = case_when(
+            mainreactEFD$FundingCategory == "Before 2025" ~ "red", 
+            mainreactEFD$FundingCategory == "2025-2030" ~ "green", 
+            mainreactEFD$FundingCategory == "After 2030" ~ "blue"
+          )
+        )
+      ) %>%
+      addLegend("bottomright", pal = color_palette, values = ~FundingCategory, title = "Funding Year", opacity = 1)
+  }
 })
 
 # ----- Congestion Map Observer -----
@@ -459,13 +625,39 @@ observeEvent(data_NTP(), {
                                 mainreactNTP$Congestion.Index >= 0.25 & mainreactNTP$Congestion.Index < 0.5 ~ "green", 
                                 mainreactNTP$Congestion.Index >= 0.5 & mainreactNTP$Congestion.Index < 0.75 ~ "orange",
                                 mainreactNTP$Congestion.Index >= 0.75 ~ "red"))) %>% 
-    addLegend(
-      position = "bottomright", 
-      colors = c("green", "orange", "red"),
-      labels = c("Not Congested", "Moderately Congested", "Severely Congested"),
-      title = "Legend",
-      opacity = 1
-    )
+      addLegend(
+        position = "bottomright", 
+        colors = c("green", "orange", "red"),
+        labels = c("Not Congested", "Moderately Congested", "Severely Congested"),
+        title = "Legend",
+        opacity = 1
+      )
+    
+  if (!is.null(input$resource_main_tab) && input$resource_main_tab == "Learner Congestion") {
+    leafletProxy("ImmersiveMap", data = mainreactNTP) %>%
+      clearMarkers() %>%
+      clearControls() %>%
+      setView(lng = mainreactNTP$Longitude[1], lat = mainreactNTP$Latitude[1], zoom = 7) %>%
+      addAwesomeMarkers(
+        clusterOptions = markerClusterOptions(disableClusteringAtZoom = 15),
+        lng = ~Longitude,
+        lat = ~Latitude,
+        label = values.congest,
+        icon = makeAwesomeIcon(
+          icon = "education",
+          library = "glyphicon",
+          markerColor = case_when(mainreactNTP$Congestion.Index >= 0 & mainreactNTP$Congestion.Index < 0.25 ~ "green", 
+                                  mainreactNTP$Congestion.Index >= 0.25 & mainreactNTP$Congestion.Index < 0.5 ~ "green", 
+                                  mainreactNTP$Congestion.Index >= 0.5 & mainreactNTP$Congestion.Index < 0.75 ~ "orange",
+                                  mainreactNTP$Congestion.Index >= 0.75 ~ "red"))) %>% 
+      addLegend(
+        position = "bottomright", 
+        colors = c("green", "orange", "red"),
+        labels = c("Not Congested", "Moderately Congested", "Severely Congested"),
+        title = "Legend",
+        opacity = 1
+      )
+  }
 })
 
 # --- 3. MAP-BOUNDS FILTERED REACTIVES ---
@@ -1069,4 +1261,146 @@ observeEvent(input$Mapping_Run, {
   safe_str(data_EFD(), "FacMapping")
   
   cat("\n=============== END DEBUGGING ===============\n\n")
-})
+}) 
+ #   - - -   8 .   I N T E R A C T I V E   I M M E R S I V E   V I E W   L O G I C   ( N E W )   - - -  
+  
+ #   1 .   R e a c t i v e   D a t a   f o r   I m m e r s i v e   V i e w  
+ d a t a _ I m m e r s i v e   < -   r e a c t i v e ( {  
+     r e q ( i n p u t $ I m m e r s i v e _ L a y e r )  
+      
+     r e g i o n _ f i l t e r   < -   i n p u t $ I m m e r s i v e _ R e g i o n  
+     l a y e r _ t y p e   < -   i n p u t $ I m m e r s i v e _ L a y e r  
+      
+     i f   ( l a y e r _ t y p e   = =   " L a s t   M i l e   S c h o o l " )   {  
+         #   S t a r t   w i t h   L M S   b a s e   d a t a  
+         d a t a _ o u t   < -   L M S   % > %  
+             f i l t e r ( L M S   = =   1 )   % > %  
+             l e f t _ j o i n ( b u i l d a b l e c s v   % > %   s e l e c t ( S C H O O L . I D ,   O T H E R . R E M A R K S . . B u i l d a b l e . S p a c e . . ) ,    
+                                 b y   =   c ( " S c h o o l _ I D "   =   " S C H O O L . I D " ) )  
+          
+         #   A p p l y   R e g i o n   F i l t e r  
+         i f   ( r e g i o n _ f i l t e r   ! =   " A l l   R e g i o n s " )   {  
+             d a t a _ o u t   < -   d a t a _ o u t   % > %   f i l t e r ( R e g i o n   = =   r e g i o n _ f i l t e r )  
+         }  
+          
+         r e t u r n ( d a t a _ o u t )  
+          
+     }   e l s e   i f   ( l a y e r _ t y p e   = =   " F a c i l i t i e s " )   {  
+         #   S t a r t   w i t h   F a c i l i t i e s   d a t a  
+         d a t a _ o u t   < -   E F D M P   % > %    
+             f i l t e r ( ! i s . n a ( O l d . R e g i o n ) ,   O l d . R e g i o n   ! =   " " )   % > %    
+             f i l t e r ( ! i s . n a ( L a t i t u d e ) ,   ! i s . n a ( L o n g i t u d e ) )   % > %    
+             m u t a t e ( L a t i t u d e   =   a s . n u m e r i c ( L a t i t u d e ) ,  
+                           A l l o c a t i o n   =   d o l l a r ( A l l o c a t i o n ,   p r e f i x   =   " â  ± " ) )   % > %  
+             d i s t i n c t ( S c h o o l I D ,   F u n d i n g Y e a r ,   A l l o c a t i o n ,   C a t e g o r y ,   . k e e p _ a l l   =   T R U E )   % > %  
+             a r r a n g e ( F u n d i n g Y e a r )  
+          
+           #   A p p l y   R e g i o n   F i l t e r  
+         i f   ( r e g i o n _ f i l t e r   ! =   " A l l   R e g i o n s " )   {  
+             d a t a _ o u t   < -   d a t a _ o u t   % > %   f i l t e r ( R e g i o n   = =   r e g i o n _ f i l t e r )  
+         }  
+          
+         #   C a t e g o r i z e   F u n d i n g   Y e a r  
+         d a t a _ o u t   < -   d a t a _ o u t   % > %    
+             m u t a t e ( F u n d i n g C a t e g o r y   =   f a c t o r (  
+                 c a s e _ w h e n (  
+                     F u n d i n g Y e a r   <   2 0 2 5   ~   " B e f o r e   2 0 2 5 " ,  
+                     ( F u n d i n g Y e a r   > =   2 0 2 5   &   F u n d i n g Y e a r   < =   2 0 3 0 )   ~   " 2 0 2 5 - 2 0 3 0 " ,  
+                     F u n d i n g Y e a r   >   2 0 3 0   ~   " A f t e r   2 0 3 0 "  
+                 ) ,  
+                 l e v e l s   =   c ( " B e f o r e   2 0 2 5 " ,   " 2 0 2 5 - 2 0 3 0 " ,   " A f t e r   2 0 3 0 " )  
+             ) )  
+              
+         r e t u r n ( d a t a _ o u t )  
+     }  
+ } )  
+  
+ #   2 .   U p d a t e   M a p   M a r k e r s  
+ o b s e r v e ( {  
+     d a t a _ m a p   < -   d a t a _ I m m e r s i v e ( )  
+     r e q ( d a t a _ m a p ,   n r o w ( d a t a _ m a p )   >   0 )  
+      
+     l a y e r _ t y p e   < -   i n p u t $ I m m e r s i v e _ L a y e r  
+      
+     p r o x y   < -   l e a f l e t P r o x y ( " I m m e r s i v e M a p " ,   d a t a   =   d a t a _ m a p )   % > %  
+         c l e a r M a r k e r s ( )   % > %  
+         c l e a r M a r k e r C l u s t e r s ( )   % > %    
+         c l e a r C o n t r o l s ( )  
+          
+     #   C e n t e r i n g   i s   h a n d l e d   b y   u s e r   i n t e r a c t i o n   o r   i n i t i a l   l o a d ,    
+     #   b u t   m a y b e   w e   c e n t e r   o n   t h e   f i r s t   f i l t e r e d   i t e m   i f   i t ' s   a   s p e c i f i c   r e g i o n ?  
+     #   L e t ' s   r e l y   o n   t h e   u s e r   z o o m i n g   o r   s e a r c h   f o r   n o w   t o   a v o i d   j u m p i n e s s ,    
+     #   U N L E S S   t h e   r e g i o n   c h a n g e s .  
+      
+     #   - - -   L M S   M A R K E R S   - - -  
+     i f   ( l a y e r _ t y p e   = =   " L a s t   M i l e   S c h o o l " )   {  
+         p r o x y   % > %  
+             a d d A w e s o m e M a r k e r s (  
+                 c l u s t e r O p t i o n s   =   m a r k e r C l u s t e r O p t i o n s ( d i s a b l e C l u s t e r i n g A t Z o o m   =   1 2 ) ,  
+                 l n g   =   ~ L o n g i t u d e ,  
+                 l a t   =   ~ L a t i t u d e ,  
+                 i c o n   =   m a k e A w e s o m e I c o n ( i c o n   =   " e d u c a t i o n " ,   l i b r a r y   =   " g l y p h i c o n " ,  
+                                                               m a r k e r C o l o r   =   c a s e _ w h e n (  
+                                                                   ( d a t a _ m a p $ B u i l d a b l e _ s p a c e   = =   0   &   d a t a _ m a p $ E s t i m a t e d _ C L _ S h o r t a g e   = =   0 )   ~   " g r a y " ,  
+                                                                   d a t a _ m a p $ B u i l d a b l e _ s p a c e   = =   0   ~   " r e d " ,  
+                                                                   d a t a _ m a p $ B u i l d a b l e _ s p a c e   = =   1   ~   " g r e e n " ,  
+                                                               ) ) ,  
+                 l a b e l   =   p a s t e ( " S c h o o l   N a m e : " , d a t a _ m a p $ S c h o o l _ N a m e )   % > %   l a p p l y ( h t m l t o o l s : : H T M L )  
+             )  
+              
+     #   - - -   F A C I L I T I E S   M A R K E R S   - - -  
+     }   e l s e   {  
+         v a l u e s . e f d m a s t e r l i s t   < -   p a s t e ( s t r o n g ( " S C H O O L   I N F O R M A T I O N " ) , " < b r > S c h o o l   N a m e : " , d a t a _ m a p $ S c h o o l . N a m e , " < b r > S c h o o l   I D : " , d a t a _ m a p $ S c h o o l I D , " < b r > C a t e g o r y : " , d a t a _ m a p $ C a t e g o r y , " < b r > F u n d i n g   Y e a r : " , d a t a _ m a p $ F u n d i n g Y e a r , " < b r > A l l o c a t i o n : " , d a t a _ m a p $ A l l o c a t i o n )   % > %   l a p p l y ( h t m l t o o l s : : H T M L )  
+         c o l o r _ p a l e t t e   < -   c o l o r F a c t o r ( p a l e t t e   =   c ( " r e d " ,   " g r e e n " ,   " b l u e " ) ,   d o m a i n   =   d a t a _ m a p $ F u n d i n g C a t e g o r y ,   l e v e l s   =   l e v e l s ( d a t a _ m a p $ F u n d i n g C a t e g o r y ) )  
+          
+         p r o x y   % > %  
+             a d d A w e s o m e M a r k e r s (  
+                 c l u s t e r O p t i o n s   =   m a r k e r C l u s t e r O p t i o n s ( d i s a b l e C l u s t e r i n g A t Z o o m   =   1 5 ) ,  
+                 l n g   =   ~ L o n g i t u d e ,  
+                 l a t   =   ~ L a t i t u d e ,  
+                 l a b e l   =   v a l u e s . e f d m a s t e r l i s t ,  
+                 l a b e l O p t i o n s   =   l a b e l O p t i o n s ( n o H i d e   =   F A L S E ,   d i r e c t i o n   =   " a u t o " ,   t e x t s i z e   =   " 1 2 p x " ,   s t y l e   =   l i s t ( " f o n t - w e i g h t "   =   " b o l d " ,   " p a d d i n g "   =   " 3 p x   8 p x " ,   " b o r d e r - r a d i u s "   =   " 5 p x " ) ) ,  
+                 i c o n   =   m a k e A w e s o m e I c o n (  
+                     i c o n   =   " e d u c a t i o n " ,  
+                     l i b r a r y   =   " g l y p h i c o n " ,  
+                     m a r k e r C o l o r   =   c a s e _ w h e n (  
+                         d a t a _ m a p $ F u n d i n g C a t e g o r y   = =   " B e f o r e   2 0 2 5 "   ~   " r e d " ,    
+                         d a t a _ m a p $ F u n d i n g C a t e g o r y   = =   " 2 0 2 5 - 2 0 3 0 "   ~   " g r e e n " ,    
+                         d a t a _ m a p $ F u n d i n g C a t e g o r y   = =   " A f t e r   2 0 3 0 "   ~   " b l u e "  
+                     )  
+                 )  
+             )   % > %  
+             a d d L e g e n d ( " b o t t o m r i g h t " ,   p a l   =   c o l o r _ p a l e t t e ,   v a l u e s   =   ~ F u n d i n g C a t e g o r y ,   t i t l e   =   " F u n d i n g   Y e a r " ,   o p a c i t y   =   1 )  
+     }  
+ } )  
+  
+ #   3 .   U p d a t e   S e a r c h   C h o i c e s   ( S c h o o l   N a m e s )  
+ o b s e r v e ( {  
+     d a t a _ m a p   < -   d a t a _ I m m e r s i v e ( )  
+     r e q ( d a t a _ m a p )  
+      
+     #   D e t e r m i n e   c o r r e c t   c o l u m n   n a m e   f o r   S c h o o l   N a m e   d e p e n d i n g   o n   d a t a s e t  
+     s c h o o l _ n a m e s   < -   i f ( " S c h o o l _ N a m e "   % i n %   n a m e s ( d a t a _ m a p ) )   d a t a _ m a p $ S c h o o l _ N a m e   e l s e   d a t a _ m a p $ S c h o o l . N a m e  
+     s c h o o l _ n a m e s   < -   s o r t ( u n i q u e ( s c h o o l _ n a m e s ) )  
+      
+     u p d a t e S e l e c t i z e I n p u t ( s e s s i o n ,   " I m m e r s i v e _ S e a r c h " ,   c h o i c e s   =   c ( " " ,   s c h o o l _ n a m e s ) ,   s e r v e r   =   T R U E )  
+ } )  
+  
+ #   4 .   S e a r c h   Z o o m   L o g i c  
+ o b s e r v e E v e n t ( i n p u t $ I m m e r s i v e _ S e a r c h ,   {  
+     r e q ( i n p u t $ I m m e r s i v e _ S e a r c h )  
+     s c h o o l _ n a m e   < -   i n p u t $ I m m e r s i v e _ S e a r c h  
+     d a t a _ m a p   < -   d a t a _ I m m e r s i v e ( )  
+      
+     #   D e t e r m i n e   c o r r e c t   c o l u m n   n a m e  
+     n a m e _ c o l   < -   i f ( " S c h o o l _ N a m e "   % i n %   n a m e s ( d a t a _ m a p ) )   " S c h o o l _ N a m e "   e l s e   " S c h o o l . N a m e "  
+      
+     t a r g e t _ s c h o o l   < -   d a t a _ m a p [ d a t a _ m a p [ [ n a m e _ c o l ] ]   = =   s c h o o l _ n a m e ,   ]  
+      
+     i f   ( n r o w ( t a r g e t _ s c h o o l )   >   0 )   {  
+         l e a f l e t P r o x y ( " I m m e r s i v e M a p " )   % > %  
+             f l y T o ( l n g   =   t a r g e t _ s c h o o l $ L o n g i t u d e [ 1 ] ,   l a t   =   t a r g e t _ s c h o o l $ L a t i t u d e [ 1 ] ,   z o o m   =   1 8 )   % > %    
+             o p e n P o p u p ( l n g   =   t a r g e t _ s c h o o l $ L o n g i t u d e [ 1 ] ,   l a t   =   t a r g e t _ s c h o o l $ L a t i t u d e [ 1 ] ,   " < b > S e l e c t e d   S c h o o l < / b > " )   #   S i m p l e   p o p u p   t o   h i g h l i g h t  
+     }  
+ } )  
+ 
